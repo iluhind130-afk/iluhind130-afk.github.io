@@ -1,50 +1,450 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>С Днём Рождения!</title>
-    <style>
-        body {
-            background-color: #ffeef2; /* Нежно-розовый фон */
-            font-family: 'Segoe UI', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            text-align: center;
-            max-width: 350px;
-            border: 2px solid #ffb6c1;
-        }
-        h1 {
-            color: #ff4d6d;
-            font-size: 28px;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #666;
-            font-size: 18px;
-            line-height: 1.5;
-        }
-        .emoji {
-            font-size: 50px;
-            margin-bottom: 15px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>С днём рождения, Лиза!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #fbf6f0;
+    --paper: #fffdf9;
+    --rose: #f2c4c4;
+    --rose-deep: #c9707a;
+    --navy: #23395b;
+    --sea: #a9cfe0;
+    --gold: #c8a15a;
+    --ink: #3b2f35;
+    --muted: #8a7b80;
+    --ok: #6fae8c;
+    --bad: #d98080;
+    --shadow: 0 10px 30px rgba(35, 57, 91, 0.10);
+    --radius: 22px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; }
+  button { font-family: inherit; cursor: pointer; border: none; }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    padding: 60px 16px 140px;
+    background: radial-gradient(ellipse at top, #fde9e4 0%, var(--cream) 60%);
+    overflow: hidden;
+  }
+  .float {
+    position: absolute; font-size: 28px; opacity: .55;
+    animation: drift 9s ease-in-out infinite;
+    user-select: none; pointer-events: none;
+  }
+  @keyframes drift {
+    0%,100% { transform: translateY(0) rotate(-6deg); }
+    50% { transform: translateY(-22px) rotate(6deg); }
+  }
+  .hero .date {
+    font-weight: 700; letter-spacing: .25em; font-size: 13px;
+    color: var(--rose-deep); text-transform: uppercase;
+  }
+  .hero .age {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(120px, 32vw, 220px); line-height: .9; font-weight: 700;
+    background: linear-gradient(135deg, var(--gold), #e6c98f 50%, var(--rose-deep));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    margin: 10px 0 0;
+  }
+  .hero h1 { font-size: clamp(38px, 9vw, 64px); color: var(--navy); line-height: 1.1; }
+  .hero h1 em { color: var(--rose-deep); font-style: italic; }
+  .hero p.sub { color: var(--muted); margin-top: 12px; font-size: 17px; max-width: 460px; }
+
+  .cards {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    margin-top: 40px; width: 100%; max-width: 720px;
+  }
+  .card {
+    background: var(--paper); border-radius: var(--radius); padding: 22px 12px;
+    box-shadow: var(--shadow); text-decoration: none; color: var(--ink);
+    transition: transform .25s, box-shadow .25s;
+    border: 1px solid rgba(200,161,90,.18);
+  }
+  .card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(35,57,91,.16); }
+  .card .ico { font-size: 34px; }
+  .card .t { font-weight: 800; margin-top: 8px; }
+  .card .d { font-size: 13px; color: var(--muted); }
+
+  .waves { position: absolute; left: 0; bottom: 0; width: 100%; height: 110px; }
+  .boat { position: absolute; bottom: 62px; font-size: 34px; animation: sail 18s linear infinite; }
+  @keyframes sail {
+    0% { left: -60px; transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+    100% { left: 105%; transform: rotate(-4deg); }
+  }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; justify-content: center; gap: 8px; padding: 12px 16px;
+    background: rgba(251,246,240,.85); backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(200,161,90,.2);
+  }
+  nav a {
+    text-decoration: none; color: var(--navy); font-weight: 700; font-size: 14px;
+    padding: 8px 14px; border-radius: 999px; transition: background .2s;
+  }
+  nav a:hover { background: var(--rose); }
+
+  /* ---------- SECTIONS ---------- */
+  section.block { padding: 80px 16px; max-width: 860px; margin: 0 auto; }
+  .head { text-align: center; margin-bottom: 36px; }
+  .head .num { color: var(--gold); font-weight: 800; letter-spacing: .2em; font-size: 13px; }
+  .head h2 { font-size: clamp(36px, 8vw, 52px); color: var(--navy); }
+  .head p { color: var(--muted); }
+  .divider { text-align: center; color: var(--gold); letter-spacing: .6em; opacity: .7; }
+
+  /* ---------- QUIZ ---------- */
+  .quiz {
+    background: var(--paper); border-radius: 28px; box-shadow: var(--shadow);
+    padding: 28px; max-width: 620px; margin: 0 auto;
+    border: 1px solid rgba(200,161,90,.18);
+  }
+  .progress { height: 8px; background: #f1e7df; border-radius: 99px; overflow: hidden; }
+  .progress div { height: 100%; width: 0; background: linear-gradient(90deg, var(--rose), var(--rose-deep)); transition: width .5s; }
+  .qmeta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin: 10px 0 18px; font-weight: 700; }
+  .qphoto { width: 100%; max-height: 320px; object-fit: cover; border-radius: 18px; margin-bottom: 18px; }
+  .qtext { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1.2; margin-bottom: 18px; }
+  .opts { display: grid; gap: 10px; }
+  .opt {
+    text-align: left; padding: 14px 18px; border-radius: 16px; font-size: 16px; font-weight: 600;
+    background: var(--cream); color: var(--ink); border: 2px solid transparent;
+    transition: transform .15s, background .2s, border-color .2s;
+  }
+  .opt:hover:not(:disabled) { transform: translateX(4px); border-color: var(--rose); }
+  .opt.ok { background: #e3f3ea; border-color: var(--ok); }
+  .opt.bad { background: #fbe5e5; border-color: var(--bad); }
+  .opt:disabled { cursor: default; }
+  .note { margin-top: 16px; padding: 14px 16px; border-radius: 16px; background: #fdf1e6; font-size: 15px; display: none; }
+  .btn {
+    display: inline-block; margin-top: 18px; padding: 14px 26px; border-radius: 999px;
+    background: var(--navy); color: #fff; font-weight: 800; font-size: 15px;
+    box-shadow: 0 8px 20px rgba(35,57,91,.25); transition: transform .2s; text-decoration: none;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.rose { background: var(--rose-deep); box-shadow: 0 8px 20px rgba(201,112,122,.3); }
+  .result { text-align: center; }
+  .result .score { font-family: 'Cormorant Garamond', serif; font-size: 80px; color: var(--rose-deep); font-weight: 700; line-height: 1; }
+
+  /* ---------- GALLERY ---------- */
+  .gallery { columns: 3 220px; column-gap: 14px; }
+  .ph {
+    break-inside: avoid; margin-bottom: 14px; background: var(--paper); padding: 10px 10px 14px;
+    border-radius: 14px; box-shadow: var(--shadow); cursor: pointer; transition: transform .25s;
+  }
+  .ph:nth-child(odd) { transform: rotate(-1.2deg); }
+  .ph:nth-child(even) { transform: rotate(1.2deg); }
+  .ph:hover { transform: rotate(0) scale(1.03); }
+  .ph img { width: 100%; display: block; border-radius: 8px; }
+  .ph .empty {
+    aspect-ratio: 4/5; border-radius: 8px; display: flex; align-items: center; justify-content: center;
+    background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
+    color: var(--muted); font-weight: 700;
+  }
+  .ph .cap { text-align: center; font-size: 14px; color: var(--muted); margin-top: 8px; font-weight: 600; }
+  .lightbox {
+    position: fixed; inset: 0; background: rgba(35,57,91,.88); z-index: 50;
+    display: none; align-items: center; justify-content: center; flex-direction: column; padding: 16px;
+  }
+  .lightbox.open { display: flex; }
+  .lightbox img { max-width: 100%; max-height: 80vh; border-radius: 14px; }
+  .lightbox .cap { color: #fff; margin-top: 12px; font-weight: 600; }
+
+  /* ---------- WISHES ---------- */
+  .envelope-wrap { text-align: center; }
+  .envelope {
+    width: 260px; height: 170px; margin: 0 auto; position: relative; cursor: pointer;
+    background: var(--rose); border-radius: 12px; box-shadow: var(--shadow);
+    transition: transform .3s;
+  }
+  .envelope:hover { transform: scale(1.04) rotate(-1deg); }
+  .envelope::before {
+    content: ''; position: absolute; left: 0; top: 0; width: 0; height: 0;
+    border-left: 130px solid transparent; border-right: 130px solid transparent;
+    border-top: 95px solid #eab1b1;
+  }
+  .seal {
+    position: absolute; left: 50%; top: 70px; transform: translateX(-50%);
+    width: 50px; height: 50px; border-radius: 50%; background: var(--rose-deep);
+    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px;
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  }
+  .letter {
+    display: none; background: var(--paper); border-radius: 24px; padding: 36px 28px;
+    box-shadow: var(--shadow); max-width: 620px; margin: 0 auto;
+    border: 1px solid rgba(200,161,90,.25);
+    background-image: linear-gradient(transparent 31px, rgba(169,207,224,.35) 32px);
+    background-size: 100% 32px;
+    animation: rise .8s ease;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
+  .letter h3 { font-size: 34px; color: var(--navy); margin-bottom: 10px; }
+  .letter p { font-size: 17px; line-height: 32px; margin-bottom: 0; }
+  .letter .sign { text-align: right; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 24px; color: var(--rose-deep); margin-top: 16px; }
+
+  footer { text-align: center; padding: 40px 16px 60px; color: var(--muted); font-size: 14px; }
+
+  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; }
+
+  @media (max-width: 560px) {
+    .cards { grid-template-columns: 1fr; max-width: 320px; }
+    .card { display: flex; align-items: center; gap: 14px; text-align: left; padding: 16px 18px; }
+    .card .t { margin-top: 0; }
+    .quiz { padding: 20px; }
+    .qtext { font-size: 24px; }
+    nav a { padding: 8px 10px; font-size: 13px; }
+  }
+</style>
 </head>
 <body>
 
-    <div class="card">
-        <div class="emoji">🎂✨</div>
-        <h1>С Днём Рождения!</h1>
-        <p>Пусть этот день будет наполнен радостью, улыбками и самыми близкими людьми! Оставайся такой же замечательной! 💖</p>
-    </div>
+<canvas id="confetti"></canvas>
 
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <span class="float" style="top:10%;left:8%">🎹</span>
+  <span class="float" style="top:16%;right:10%;animation-delay:-2s">📚</span>
+  <span class="float" style="top:40%;left:5%;animation-delay:-4s">π</span>
+  <span class="float" style="top:34%;right:6%;animation-delay:-6s">👑</span>
+  <span class="float" style="top:62%;left:14%;animation-delay:-3s">♪</span>
+  <span class="float" style="top:58%;right:14%;animation-delay:-5s">∞</span>
+
+  <div class="date">01 · 10 · 2026</div>
+  <div class="age">18</div>
+  <h1>С днём рождения,<br><em>Лиза!</em></h1>
+  <p class="sub">Этот сайт сделан специально для тебя. Внутри три сюрприза, открывай по порядку ✨</p>
+
+  <div class="cards">
+    <a class="card" href="#quiz"><div class="ico">🧩</div><div><div class="t">Викторина</div><div class="d">Насколько хорошо ты помнишь нашу историю?</div></div></a>
+    <a class="card" href="#gallery"><div class="ico">📸</div><div><div class="t">Галерея</div><div class="d">Наши моменты</div></div></a>
+    <a class="card" href="#wishes"><div class="ico">💌</div><div><div class="t">Пожелания</div><div class="d">Письмо для тебя</div></div></a>
+  </div>
+
+  <span class="boat">⛵</span>
+  <svg class="waves" viewBox="0 0 1440 110" preserveAspectRatio="none">
+    <path fill="#a9cfe0" fill-opacity=".45" d="M0,60 C240,110 480,10 720,50 C960,90 1200,20 1440,60 L1440,110 L0,110 Z"/>
+    <path fill="#23395b" fill-opacity=".18" d="M0,80 C300,40 540,110 780,80 C1020,50 1260,100 1440,75 L1440,110 L0,110 Z"/>
+  </svg>
+</header>
+
+<nav>
+  <a href="#quiz">🧩 Викторина</a>
+  <a href="#gallery">📸 Галерея</a>
+  <a href="#wishes">💌 Пожелания</a>
+</nav>
+
+<!-- ================= 1. QUIZ ================= -->
+<section class="block" id="quiz">
+  <div class="head">
+    <div class="num">ЧАСТЬ I</div>
+    <h2>Викторина</h2>
+    <p>Проверим, кто лучше помнит нашу историю</p>
+  </div>
+  <div class="quiz" id="quizBox"></div>
+</section>
+
+<div class="divider">♛ ♪ ⛵</div>
+
+<!-- ================= 2. GALLERY ================= -->
+<section class="block" id="gallery">
+  <div class="head">
+    <div class="num">ЧАСТЬ II</div>
+    <h2>Наша галерея</h2>
+    <p>Нажми на фото, чтобы открыть</p>
+  </div>
+  <div class="gallery" id="galleryBox"></div>
+</section>
+
+<div class="divider">♛ ♪ ⛵</div>
+
+<!-- ================= 3. WISHES ================= -->
+<section class="block" id="wishes">
+  <div class="head">
+    <div class="num">ЧАСТЬ III</div>
+    <h2>Пожелания</h2>
+    <p>Нажми на конверт</p>
+  </div>
+  <div class="envelope-wrap" id="envWrap">
+    <div class="envelope" id="envelope"><div class="seal">♛</div></div>
+  </div>
+  <div class="letter" id="letter">
+    <h3>Дорогая Лиза,</h3>
+    <p>[Здесь будет твоё поздравление. Пришли мне текст, и я красиво вставлю его сюда.]</p>
+    <p>[Можно несколько абзацев.]</p>
+    <div class="sign">Твой ___</div>
+  </div>
+</section>
+
+<footer>Сделано специально для Лизы · 2026</footer>
+
+<div class="lightbox" id="lightbox"><img id="lbImg" alt=""><div class="cap" id="lbCap"></div></div>
+
+<script>
+/* ============================================================
+   ВОПРОСЫ ВИКТОРИНЫ
+   answer — номер правильного варианта, считая с 0
+   photo  — имя файла фото (можно оставить пустым "")
+   ============================================================ */
+const QUESTIONS = [
+  {
+    q: "Когда мы начали встречаться?",
+    options: ["1 октября", "16 октября", "31 декабря", "14 февраля"],
+    answer: 1,
+    photo: "",
+    note: "16 октября — день, с которого всё началось 💛"
+  },
+  {
+    q: "Какой сериал ты можешь пересматривать бесконечно?",
+    options: ["Бриджертоны", "Корона", "Царство", "Шерлок"],
+    answer: 2,
+    photo: "",
+    note: "Кто бы сомневался 👑"
+  },
+  {
+    q: "Что из этого НЕ твоё увлечение?",
+    options: ["Пианино", "Яхтинг", "Математика", "Скалолазание"],
+    answer: 3,
+    photo: "",
+    note: "Пианино, паруса и матеша — вот это набор!"
+  }
+];
+
+/* ============================================================
+   ФОТО ДЛЯ ГАЛЕРЕИ
+   src — имя файла, загруженного в репозиторий
+   ============================================================ */
+const PHOTOS = [
+  { src: "photo1.jpg", caption: "Подпись 1" },
+  { src: "photo2.jpg", caption: "Подпись 2" },
+  { src: "photo3.jpg", caption: "Подпись 3" },
+  { src: "photo4.jpg", caption: "Подпись 4" },
+  { src: "photo5.jpg", caption: "Подпись 5" },
+  { src: "photo6.jpg", caption: "Подпись 6" }
+];
+
+/* ---------------- QUIZ LOGIC ---------------- */
+const quizBox = document.getElementById('quizBox');
+let current = 0, score = 0;
+
+function renderQuestion() {
+  const item = QUESTIONS[current];
+  const pct = (current / QUESTIONS.length) * 100;
+  quizBox.innerHTML = `
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="qmeta"><span>Вопрос ${current + 1} из ${QUESTIONS.length}</span><span>Очки: ${score}</span></div>
+    ${item.photo ? `<img class="qphoto" src="${item.photo}" alt="">` : ''}
+    <div class="qtext">${item.q}</div>
+    <div class="opts">${item.options.map((o, i) => `<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>
+    <div class="note" id="note"></div>
+    <div id="nextWrap"></div>
+  `;
+  quizBox.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
+}
+
+function choose(i) {
+  const item = QUESTIONS[current];
+  const btns = quizBox.querySelectorAll('.opt');
+  btns.forEach(b => b.disabled = true);
+  btns[item.answer].classList.add('ok');
+  if (i === item.answer) { score++; burst(40); }
+  else btns[i].classList.add('bad');
+  const note = document.getElementById('note');
+  note.textContent = (i === item.answer ? 'Верно! ' : 'Не совсем. ') + (item.note || '');
+  note.style.display = 'block';
+  const last = current === QUESTIONS.length - 1;
+  document.getElementById('nextWrap').innerHTML =
+    `<button class="btn" id="nextBtn">${last ? 'Узнать результат' : 'Дальше →'}</button>`;
+  document.getElementById('nextBtn').onclick = () => { current++; last ? renderResult() : renderQuestion(); };
+}
+
+function renderResult() {
+  const total = QUESTIONS.length;
+  let msg = 'Идеально! Ты помнишь всё 🥹';
+  if (score < total) msg = 'Почти идеально! Остальное вспомним вместе 😊';
+  if (score < total / 2) msg = 'Кажется, пора устроить вечер воспоминаний 😄';
+  quizBox.innerHTML = `
+    <div class="progress"><div style="width:100%"></div></div>
+    <div class="result" style="margin-top:24px">
+      <div class="score">${score}/${total}</div>
+      <p style="font-size:18px;margin-top:10px">${msg}</p>
+      <a class="btn rose" href="#gallery">Дальше: галерея 📸</a><br>
+      <button class="btn" style="background:transparent;color:var(--navy);box-shadow:none" id="again">Пройти ещё раз</button>
+    </div>`;
+  document.getElementById('again').onclick = () => { current = 0; score = 0; renderQuestion(); };
+  burst(180);
+}
+renderQuestion();
+
+/* ---------------- GALLERY LOGIC ---------------- */
+const galleryBox = document.getElementById('galleryBox');
+const lb = document.getElementById('lightbox');
+PHOTOS.forEach((p, n) => {
+  const el = document.createElement('div');
+  el.className = 'ph';
+  el.innerHTML = `<img src="${p.src}" alt=""><div class="cap">${p.caption}</div>`;
+  const img = el.querySelector('img');
+  img.onerror = () => { img.outerHTML = `<div class="empty">фото ${n + 1}</div>`; };
+  el.onclick = () => {
+    const i = el.querySelector('img'); if (!i) return;
+    document.getElementById('lbImg').src = i.src;
+    document.getElementById('lbCap').textContent = p.caption;
+    lb.classList.add('open');
+  };
+  galleryBox.appendChild(el);
+});
+lb.onclick = () => lb.classList.remove('open');
+
+/* ---------------- ENVELOPE ---------------- */
+document.getElementById('envelope').onclick = () => {
+  document.getElementById('envWrap').style.display = 'none';
+  document.getElementById('letter').style.display = 'block';
+  burst(200);
+};
+
+/* ---------------- CONFETTI ---------------- */
+const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
+let parts = [];
+function size() { cv.width = innerWidth; cv.height = innerHeight; }
+size(); addEventListener('resize', size);
+const COLORS = ['#f2c4c4', '#c9707a', '#c8a15a', '#a9cfe0', '#23395b', '#fde9e4'];
+function burst(n) {
+  for (let i = 0; i < n; i++) parts.push({
+    x: innerWidth / 2 + (Math.random() - .5) * 200, y: innerHeight / 3,
+    vx: (Math.random() - .5) * 14, vy: Math.random() * -12 - 4,
+    s: Math.random() * 7 + 4, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
+    c: COLORS[Math.floor(Math.random() * COLORS.length)], life: 0
+  });
+  if (parts.length === n) loop();
+}
+function loop() {
+  cx.clearRect(0, 0, cv.width, cv.height);
+  parts.forEach(p => {
+    p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.vx *= .99; p.life++;
+    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
+    cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore();
+  });
+  parts = parts.filter(p => p.y < cv.height + 20 && p.life < 300);
+  if (parts.length) requestAnimationFrame(loop); else cx.clearRect(0, 0, cv.width, cv.height);
+}
+window.addEventListener('load', () => setTimeout(() => burst(120), 400));
+</script>
 </body>
-</html>
