@@ -134,6 +134,20 @@
   .opt.ok { background: #e3f3ea; border-color: var(--ok); }
   .opt.bad { background: #fbe5e5; border-color: var(--bad); }
   .opt:disabled { cursor: default; }
+  .opts.photos { grid-template-columns: repeat(3, 1fr); }
+  .opt.pic { padding: 6px; text-align: center; }
+  .opt.pic:hover:not(:disabled) { transform: scale(1.03); }
+  .opt.pic img, .opt.pic .empty {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; display: flex;
+    align-items: center; justify-content: center; color: var(--muted); font-weight: 700;
+    background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
+  }
+  .opt.pic span { display: block; margin-top: 6px; font-size: 14px; }
+  textarea.open {
+    width: 100%; min-height: 120px; padding: 14px 16px; border-radius: 16px; resize: vertical;
+    border: 2px solid var(--rose); background: var(--cream); font: inherit; font-size: 16px; color: var(--ink);
+  }
+  textarea.open:focus { outline: none; border-color: var(--rose-deep); }
   .note { margin-top: 16px; padding: 14px 16px; border-radius: 16px; background: #fdf1e6; font-size: 15px; display: none; }
   .btn {
     display: inline-block; margin-top: 18px; padding: 14px 26px; border-radius: 999px;
@@ -302,61 +316,137 @@
 /* ============================================================
    ВОПРОСЫ ВИКТОРИНЫ
    answer — номер правильного варианта, считая с 0
-   photo  — имя файла фото (можно оставить пустым "")
+   type: "photo" — варианты-картинки, "open" — свободный ответ
    ============================================================ */
 const QUESTIONS = [
   {
-    q: "Когда мы начали встречаться?",
-    options: ["1 октября", "16 октября", "31 декабря", "14 февраля"],
+    q: "Как полностью зовут родителей Данька? 😄",
+    options: [
+      "Владимир Игоревич и Юлия Юрьевна",
+      "Владимир Юрьевич и Юлия Игоревна",
+      "Вячеслав Юрьевич и Юлия Игоревна",
+      "Владимир Юрьевич и Юлиана Игоревна"
+    ],
     answer: 1,
-    photo: "",
-    note: "16 октября — день, с которого всё началось 💛"
+    note: "Владимир Юрьевич и Юлия Игоревна. Надеюсь, ты не запуталась 😏"
   },
   {
-    q: "Какой сериал ты можешь пересматривать бесконечно?",
-    options: ["Бриджертоны", "Корона", "Царство", "Шерлок"],
+    q: "Как мы впервые познакомились?",
+    options: [
+      "На БЗС",
+      "На пьянке у Совбака",
+      "На уроках матана у нашего любимого Зубика",
+      "В очереди в столовой"
+    ],
     answer: 2,
-    photo: "",
-    note: "Кто бы сомневался 👑"
+    note: "Матан и Зубик — вот кого надо благодарить 📐"
   },
   {
-    q: "Что из этого НЕ твоё увлечение?",
-    options: ["Пианино", "Яхтинг", "Математика", "Скалолазание"],
+    q: "После какого мероприятия я впервые пошёл тебя провожать?",
+    options: [
+      "После олимпиады по математике",
+      "После наших посиделок в ЦР",
+      "После концерта в музыкалке",
+      "После выпускного"
+    ],
+    answer: 1,
+    note: "Посиделки в ЦР))))"
+  },
+  {
+    q: "Какую дату можно назвать началом наших отношений?",
+    options: ["1 апреля", "16 апреля", "16 мая", "14 февраля"],
+    answer: 1,
+    note: "16 апреля — день, с которого всё началось 💛"
+  },
+  {
+    q: "Сколько длился наш самый долгий телефонный звонок?",
+    options: ["Около часа", "2–3 часа", "Ровно 4 часа", "Больше 5 часов"],
     answer: 3,
-    photo: "",
-    note: "Пианино, паруса и матеша — вот это набор!"
+    note: "Больше 5 часов точно! И это ещё не предел 📞"
+  },
+  {
+    type: "photo",
+    q: "Какая наша совместная фотка из этих трёх — моя любимая?",
+    options: ["photos/fav1.jpg", "photos/fav2.jpg", "photos/fav3.jpg"],
+    answer: 0,
+    note: "Вот эта! 📸"
+  },
+  {
+    q: "Через сколько моих кружочков в ТГ ты отправила свой первый?",
+    options: ["Через 1", "Через 3", "Через 5", "Через целых 7"],
+    answer: 3,
+    note: "Целых 7! Но я не сдавался 😄"
+  },
+  {
+    q: "Сколько у нас с тобой сообщений в ТГ?",
+    options: ["15–20 тысяч", "28–30 тысяч", "43–44 тысячи", "60–65 тысяч"],
+    answer: 2,
+    note: "43–44 тысячи, и это число растёт каждый день 💬"
+  },
+  {
+    type: "open",
+    q: "Какое событие, на котором мы были вместе, запомнилось тебе больше всего?",
+    note: "Может быть что угодно: хоть прогулка, хоть выпускной"
+  },
+  {
+    q: "Сколько часов каждый день ты должна спать?",
+    options: ["5", "6", "7", "8", "9", "10"],
+    answer: 5,
+    note: "10!!! И это не обсуждается 😴"
   }
-];
-
-/* ============================================================
-   ФОТО ДЛЯ ГАЛЕРЕИ
-   src — имя файла, загруженного в репозиторий
-   ============================================================ */
-const PHOTOS = [
-  { src: "photo1.jpg", caption: "Подпись 1" },
-  { src: "photo2.jpg", caption: "Подпись 2" },
-  { src: "photo3.jpg", caption: "Подпись 3" },
-  { src: "photo4.jpg", caption: "Подпись 4" },
-  { src: "photo5.jpg", caption: "Подпись 5" },
-  { src: "photo6.jpg", caption: "Подпись 6" }
 ];
 
 /* ---------------- QUIZ LOGIC ---------------- */
 const quizBox = document.getElementById('quizBox');
+const GRADED = QUESTIONS.filter(x => x.type !== 'open').length;
 let current = 0, score = 0;
+
+function header() {
+  const pct = (current / QUESTIONS.length) * 100;
+  return `
+    <div class="progress"><div style="width:${pct}%"></div></div>
+    <div class="qmeta"><span>Вопрос ${current + 1} из ${QUESTIONS.length}</span><span>Очки: ${score}</span></div>`;
+}
 
 function renderQuestion() {
   const item = QUESTIONS[current];
-  const pct = (current / QUESTIONS.length) * 100;
-  quizBox.innerHTML = `
-    <div class="progress"><div style="width:${pct}%"></div></div>
-    <div class="qmeta"><span>Вопрос ${current + 1} из ${QUESTIONS.length}</span><span>Очки: ${score}</span></div>
+
+  if (item.type === 'open') {
+    quizBox.innerHTML = `${header()}
+      <div class="qtext">${item.q}</div>
+      <p style="color:var(--muted);margin:-8px 0 14px">${item.note || ''}</p>
+      <textarea class="open" id="openAns" placeholder="Напиши здесь…"></textarea>
+      <div class="note" id="note"></div>
+      <div id="nextWrap"><button class="btn rose" id="sendBtn">Ответить</button></div>`;
+    document.getElementById('sendBtn').onclick = () => {
+      const text = document.getElementById('openAns').value.trim();
+      if (!text) { document.getElementById('openAns').focus(); return; }
+      document.getElementById('openAns').disabled = true;
+      const note = document.getElementById('note');
+      note.textContent = 'Какой классный ответ! Этот вопрос без правильного ответа, тут любой засчитывается 💛';
+      note.style.display = 'block';
+      burst(40);
+      const share = 'https://t.me/share/url?url=' + encodeURIComponent(location.href) +
+        '&text=' + encodeURIComponent('Мой ответ на вопрос «' + item.q + '»: ' + text);
+      document.getElementById('nextWrap').innerHTML = `
+        <a class="btn" style="background:#2aa3d9" href="${share}" target="_blank">Отправить ответ в Telegram ✈️</a>
+        <button class="btn" id="nextBtn" style="margin-left:6px">Дальше →</button>`;
+      document.getElementById('nextBtn').onclick = next;
+    };
+    return;
+  }
+
+  const isPhoto = item.type === 'photo';
+  const opts = item.options.map((o, i) => isPhoto
+    ? `<button class="opt pic" data-i="${i}"><img src="${o}" alt="" onerror="this.outerHTML='<div class=&quot;empty&quot;>фото ${i + 1}</div>'"><span>№${i + 1}</span></button>`
+    : `<button class="opt" data-i="${i}">${o}</button>`).join('');
+
+  quizBox.innerHTML = `${header()}
     ${item.photo ? `<img class="qphoto" src="${item.photo}" alt="">` : ''}
     <div class="qtext">${item.q}</div>
-    <div class="opts">${item.options.map((o, i) => `<button class="opt" data-i="${i}">${o}</button>`).join('')}</div>
+    <div class="opts${isPhoto ? ' photos' : ''}">${opts}</div>
     <div class="note" id="note"></div>
-    <div id="nextWrap"></div>
-  `;
+    <div id="nextWrap"></div>`;
   quizBox.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
 }
 
@@ -373,11 +463,17 @@ function choose(i) {
   const last = current === QUESTIONS.length - 1;
   document.getElementById('nextWrap').innerHTML =
     `<button class="btn" id="nextBtn">${last ? 'Узнать результат' : 'Дальше →'}</button>`;
-  document.getElementById('nextBtn').onclick = () => { current++; last ? renderResult() : renderQuestion(); };
+  document.getElementById('nextBtn').onclick = next;
+}
+
+function next() {
+  current++;
+  current >= QUESTIONS.length ? renderResult() : renderQuestion();
+  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderResult() {
-  const total = QUESTIONS.length;
+  const total = GRADED;
   let msg = 'Идеально! Ты помнишь всё 🥹';
   if (score < total) msg = 'Почти идеально! Остальное вспомним вместе 😊';
   if (score < total / 2) msg = 'Кажется, пора устроить вечер воспоминаний 😄';
@@ -393,6 +489,19 @@ function renderResult() {
   burst(180);
 }
 renderQuestion();
+
+/* ============================================================
+   ФОТО ДЛЯ ГАЛЕРЕИ
+   src — имя файла, загруженного в репозиторий
+   ============================================================ */
+const PHOTOS = [
+  { src: "photo1.jpg", caption: "Подпись 1" },
+  { src: "photo2.jpg", caption: "Подпись 2" },
+  { src: "photo3.jpg", caption: "Подпись 3" },
+  { src: "photo4.jpg", caption: "Подпись 4" },
+  { src: "photo5.jpg", caption: "Подпись 5" },
+  { src: "photo6.jpg", caption: "Подпись 6" }
+];
 
 /* ---------------- GALLERY LOGIC ---------------- */
 const galleryBox = document.getElementById('galleryBox');
