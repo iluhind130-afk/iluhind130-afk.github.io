@@ -174,14 +174,16 @@
     background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
     color: var(--muted); font-weight: 700;
   }
-  .ph .cap { text-align: center; font-size: 14px; color: var(--muted); margin-top: 8px; font-weight: 600; }
+  .ph .ttl { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin: 10px 4px 2px; line-height: 1.2; }
+  .ph .story { font-size: 14.5px; color: var(--ink); margin: 6px 4px 0; line-height: 1.5; }
   .lightbox {
     position: fixed; inset: 0; background: rgba(35,57,91,.88); z-index: 50;
     display: none; align-items: center; justify-content: center; flex-direction: column; padding: 16px;
   }
   .lightbox.open { display: flex; }
   .lightbox img { max-width: 100%; max-height: 80vh; border-radius: 14px; }
-  .lightbox .cap { color: #fff; margin-top: 12px; font-weight: 600; }
+  .lightbox img { max-height: 70vh; }
+  .lightbox .cap { color: #fff; margin-top: 14px; max-width: 620px; text-align: center; line-height: 1.5; max-height: 22vh; overflow-y: auto; }
 
   /* ---------- WISHES ---------- */
   .envelope-wrap { text-align: center; }
@@ -492,15 +494,47 @@ renderQuestion();
 
 /* ============================================================
    ФОТО ДЛЯ ГАЛЕРЕИ
-   src — имя файла, загруженного в репозиторий
+   src   — имя файла фотки (не трогай)
+   title — короткий заголовок (можно оставить пустым: "")
+   story — твоя мини-история. Пиши текст МЕЖДУ кавычками "…".
+           Если внутри текста нужны кавычки, используй «ёлочки».
    ============================================================ */
 const PHOTOS = [
-  { src: "photo1.jpg", caption: "Подпись 1" },
-  { src: "photo2.jpg", caption: "Подпись 2" },
-  { src: "photo3.jpg", caption: "Подпись 3" },
-  { src: "photo4.jpg", caption: "Подпись 4" },
-  { src: "photo5.jpg", caption: "Подпись 5" },
-  { src: "photo6.jpg", caption: "Подпись 6" }
+  {
+    src: "g1.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g2.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g3.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g4.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g5.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g6.jpg",
+    title: "",
+    story: ""
+  },
+  {
+    src: "g7.jpg",
+    title: "",
+    story: ""
+  }
 ];
 
 /* ---------------- GALLERY LOGIC ---------------- */
@@ -509,13 +543,16 @@ const lb = document.getElementById('lightbox');
 PHOTOS.forEach((p, n) => {
   const el = document.createElement('div');
   el.className = 'ph';
-  el.innerHTML = `<img src="${p.src}" alt=""><div class="cap">${p.caption}</div>`;
+  el.innerHTML = `<img src="${p.src}" alt="" loading="lazy">
+    ${p.title ? `<div class="ttl">${p.title}</div>` : ''}
+    ${p.story ? `<div class="story">${p.story}</div>` : ''}`;
   const img = el.querySelector('img');
   img.onerror = () => { img.outerHTML = `<div class="empty">фото ${n + 1}</div>`; };
   el.onclick = () => {
     const i = el.querySelector('img'); if (!i) return;
     document.getElementById('lbImg').src = i.src;
-    document.getElementById('lbCap').textContent = p.caption;
+    document.getElementById('lbCap').innerHTML =
+      (p.title ? `<b>${p.title}</b><br>` : '') + (p.story || '');
     lb.classList.add('open');
   };
   galleryBox.appendChild(el);
