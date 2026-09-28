@@ -176,6 +176,23 @@
   }
   .ph .ttl { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin: 10px 4px 2px; line-height: 1.2; }
   .ph .story { font-size: 14.5px; color: var(--ink); margin: 6px 4px 0; line-height: 1.5; }
+  .subhead { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; }
+  .subhead::before, .subhead::after { content: ''; flex: 1; height: 1px; background: rgba(200,161,90,.45); }
+  .subhead span { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 28px; font-weight: 600; color: var(--rose-deep); white-space: nowrap; }
+  .subnote { text-align: center; color: var(--muted); margin: -12px 0 22px; font-size: 15px; }
+  .snaps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .snap {
+    aspect-ratio: 3/4; border-radius: 18px; overflow: hidden; cursor: pointer;
+    box-shadow: var(--shadow); border: 5px solid var(--paper);
+    transition: transform .3s, box-shadow .3s;
+  }
+  .snap:nth-child(3n+1) { transform: rotate(-1.5deg); }
+  .snap:nth-child(3n+2) { transform: translateY(10px) rotate(1deg); }
+  .snap:nth-child(3n) { transform: rotate(1.8deg); }
+  .snap:hover { transform: rotate(0) scale(1.05); box-shadow: 0 16px 36px rgba(35,57,91,.2); z-index: 2; position: relative; }
+  .snap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+  .snap:hover img { transform: scale(1.06); }
+  @media (max-width: 560px) { .snaps { grid-template-columns: repeat(2, 1fr); gap: 12px; } .snap:nth-child(n) { transform: rotate(0); } .snap:nth-child(odd) { transform: rotate(-1.2deg); } .snap:nth-child(even) { transform: translateY(12px) rotate(1.2deg); } }
   .lightbox {
     position: fixed; inset: 0; background: rgba(35,57,91,.88); z-index: 50;
     display: none; align-items: center; justify-content: center; flex-direction: column; padding: 16px;
@@ -287,7 +304,11 @@
     <h2>Наша галерея</h2>
     <p>Нажми на фото, чтобы открыть</p>
   </div>
+  <div class="subhead"><span>Наши истории</span></div>
   <div class="gallery" id="galleryBox"></div>
+  <div class="subhead" style="margin-top:56px"><span>А тут просто мы ✨</span></div>
+  <p class="subnote">Без слов, и так всё понятно</p>
+  <div class="snaps" id="snapsBox"></div>
 </section>
 
 <div class="divider">♛ ♪ ⛵</div>
@@ -503,27 +524,27 @@ const PHOTOS = [
   {
     src: "g1.jpg",
     title: "Лицейййййй",
-    story: "Надо сказать спасибо Вике за эту фотку, я не мог не добавить ее, так как именно в стенах лицея мы и познакомились!"
+    story: "Надо сказать спасибо Вике за эту фотку. Я не мог её не добавить, ведь именно в стенах лицея мы и познакомились!"
   },
   {
     src: "g2.jpg",
-    title: "Вручение атестатов",
-    story: "Ой, тут было вообще много эмоций, помню как ты подходиал знакомится к папе и маме, эту неловкость было н епередать словами. Ну и конечно, когд тебе вручали серебрянную медаль это просто, я так гордился, что ты у меня такая умная, ты бы знала!"
+    title: "Вручение аттестатов",
+    story: "Ой, тут было вообще много эмоций! Помню, как ты подходил знакомиться к папе и маме, эту неловкость было не передать словами. Ну и конечно, когда тебе вручали серебряную м…"
   },
   {
     src: "g3.jpg",
     title: "Дачка и ДР",
-    story: "Тоже невероятно памятная поездка. Между прочим первая дача, на которую тебя отпустили одну вместе со мной)"
+    story: "Тоже невероятно памятная поездка. Между прочим, первая дача, на которую тебя отпустили одну вместе со мной)"
   },
   {
     src: "g4.jpg",
     title: "Граф Орлов",
-    story: "На этой фотке я просто обожаю твой наряд, он ужасно секси 🤤, аххахххахах"
+    story: "На этой фотке я просто обожаю твой наряд, он ужасно секси 😏, аххаххахах"
   },
   {
     src: "g5.jpg",
-    title: "Арханлелькое",
-    story: "Эта та самая поездка которую оргала полностью ты и она получилась бесподобной, а я просто ходил за тобой и кайфовал)"
+    title: "Архангельское",
+    story: "Это та самая поездка, которую организовала полностью ты, и она получилась бесподобной, а я просто ходил за тобой и кайфовал)"
   },
   {
     src: "g6.jpg",
@@ -532,10 +553,16 @@ const PHOTOS = [
   },
   {
     src: "g7.jpg",
-    title: "оп оп, баскетбольчик",
+    title: "Оп-оп, баскетбольчик",
     story: "Мы тут просто няшные)))"
   }
 ];
+
+/* ============================================================
+   ПРОСТО ФОТКИ (вторая часть галереи, без подписей)
+   Чтобы добавить фото: загрузи его на GitHub и допиши имя в список
+   ============================================================ */
+const SNAPS = ["p1.jpg", "p2.jpg", "p3.jpg", "p4.jpg", "p5.jpg", "p6.jpeg", "p7.jpg"];
 
 /* ---------------- GALLERY LOGIC ---------------- */
 const galleryBox = document.getElementById('galleryBox');
@@ -558,6 +585,21 @@ PHOTOS.forEach((p, n) => {
   galleryBox.appendChild(el);
 });
 lb.onclick = () => lb.classList.remove('open');
+
+const snapsBox = document.getElementById('snapsBox');
+SNAPS.forEach((src, n) => {
+  const el = document.createElement('div');
+  el.className = 'snap';
+  el.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
+  const img = el.querySelector('img');
+  img.onerror = () => el.remove();
+  el.onclick = () => {
+    document.getElementById('lbImg').src = img.src;
+    document.getElementById('lbCap').innerHTML = '';
+    lb.classList.add('open');
+  };
+  snapsBox.appendChild(el);
+});
 
 /* ---------------- ENVELOPE ---------------- */
 document.getElementById('envelope').onclick = () => {
