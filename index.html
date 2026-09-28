@@ -138,7 +138,7 @@
   .opt.pic { padding: 6px; text-align: center; }
   .opt.pic:hover:not(:disabled) { transform: scale(1.03); }
   .opt.pic img, .opt.pic .empty {
-    width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: 12px; display: flex;
+    width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; display: flex;
     align-items: center; justify-content: center; color: var(--muted); font-weight: 700;
     background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
   }
@@ -271,7 +271,7 @@
   <div class="head">
     <div class="num">ЧАСТЬ I</div>
     <h2>Викторина</h2>
-    <p>Проверим, насколько хорошо, ты помнишь наши совместные моменты!</p>
+    <p>Проверим, насколько хорошо ты помнишь наши совместные моменты!</p>
   </div>
   <div class="quiz" id="quizBox"></div>
 </section>
@@ -320,14 +320,14 @@
    ============================================================ */
 const QUESTIONS = [
   {
-    q: "Как полностью зовут родителей Данька? ",
+    q: "Как полностью зовут родителей Данька?",
     options: [
       "Владимир Юрьевич и Юлия Игоревна",
       "Владимир Николаевич и Юлия Игоревна",
       "Вячеслав Юрьевич и Юлия Ильинична",
       "Владимир Игоревич и Юлия Юрьевна"
     ],
-    answer: 1,
+    answer: 0,
     note: "Владимир Юрьевич и Юлия Игоревна. Надеюсь, ты не забыла)"
   },
   {
@@ -338,7 +338,7 @@ const QUESTIONS = [
       "На уроках матана у нашего любимого Зубика",
       "В очереди в столовой"
     ],
-    answer: 3,
+    answer: 2,
     note: "Ну у кого, как не у Алексея Борисовича, ахахаха"
   },
   {
@@ -349,7 +349,7 @@ const QUESTIONS = [
       "После концерта в музыкалке",
       "После выпускного"
     ],
-    answer: 2,
+    answer: 1,
     note: "Посиделки в ЦР))))"
   },
   {
@@ -368,8 +368,8 @@ const QUESTIONS = [
     type: "photo",
     q: "Какая наша совместная фотка из этих трёх — моя любимая?",
     options: ["photos/fav1.jpg", "photos/fav2.jpg", "photos/fav3.jpg"],
-    answer: 0,
-    note: "Вот эта! 📸"
+    answer: 1,
+    note: "Эта фотка отражает самое начало наших отношений. Она, можно сказать, одна из первых, но именно она по-настоящему запала мне в душу. Твоя улыбка тут просто неповторима! ❤️"
   },
   {
     q: "Через сколько моих кружочков в ТГ ты отправила свой первый?",
