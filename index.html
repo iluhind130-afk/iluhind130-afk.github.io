@@ -3,636 +3,543 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>С днём рождения, Лиза!</title>
+<title>Янтарная нить — маршрут по Калининградской области</title>
+<meta name="description" content="Интерактивный путеводитель и туристический маршрут по Калининградской области: 13 остановок от Кёнигсберга до Куршской косы.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-  :root {
-    --cream: #fbf6f0;
-    --paper: #fffdf9;
-    --rose: #f2c4c4;
-    --rose-deep: #c9707a;
-    --navy: #23395b;
-    --sea: #a9cfe0;
-    --gold: #c8a15a;
-    --ink: #3b2f35;
-    --muted: #8a7b80;
-    --ok: #6fae8c;
-    --bad: #d98080;
-    --shadow: 0 10px 30px rgba(35, 57, 91, 0.10);
-    --radius: 22px;
+  :root{
+    --sea:#0f2a3a;
+    --sea-2:#173b50;
+    --sand:#f6efe3;
+    --sand-2:#ece2cf;
+    --ink:#1d2a33;
+    --muted:#5d6b74;
+    --amber:#d98a1c;
+    --amber-2:#f2b544;
+    --line:#d9cdb6;
+    --radius:14px;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    font-family: 'Nunito', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    line-height: 1.55;
-    overflow-x: hidden;
-  }
-  h1, h2, h3 { font-family: 'Cormorant Garamond', serif; font-weight: 600; }
-  button { font-family: inherit; cursor: pointer; border: none; }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:"Manrope",system-ui,sans-serif;color:var(--ink);background:var(--sand);line-height:1.65;font-size:17px}
+  img{max-width:100%;display:block}
+  a{color:var(--amber)}
+  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.15}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
 
-  /* ---------- HERO ---------- */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    text-align: center;
-    padding: 60px 16px 140px;
-    background: radial-gradient(ellipse at top, #fde9e4 0%, var(--cream) 60%);
-    overflow: hidden;
-  }
-  .float {
-    position: absolute; font-size: 28px; opacity: .55;
-    animation: drift 9s ease-in-out infinite;
-    user-select: none; pointer-events: none;
-  }
-  @keyframes drift {
-    0%,100% { transform: translateY(0) rotate(-6deg); }
-    50% { transform: translateY(-22px) rotate(6deg); }
-  }
-  .hero .date {
-    font-weight: 700; letter-spacing: .25em; font-size: 13px;
-    color: var(--rose-deep); text-transform: uppercase;
-  }
-  .hero .age {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: clamp(120px, 32vw, 220px); line-height: .9; font-weight: 700;
-    background: linear-gradient(135deg, var(--gold), #e6c98f 50%, var(--rose-deep));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    margin: 10px 0 0;
-  }
-  .hero h1 { font-size: clamp(38px, 9vw, 64px); color: var(--navy); line-height: 1.1; }
-  .hero h1 em { color: var(--rose-deep); font-style: italic; }
-  .hero p.sub { color: var(--muted); margin-top: 12px; font-size: 17px; max-width: 460px; }
+  /* ---------- навигация ---------- */
+  nav{position:sticky;top:0;z-index:1000;background:rgba(15,42,58,.94);backdrop-filter:blur(6px)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+  .logo{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;color:var(--sand);text-decoration:none;white-space:nowrap}
+  .logo span{color:var(--amber-2)}
+  .menu{display:flex;gap:22px;list-style:none}
+  .menu a{color:#cfdbe2;text-decoration:none;font-size:15px;font-weight:500}
+  .menu a:hover{color:var(--amber-2)}
+  .burger{display:none;background:none;border:0;color:var(--sand);font-size:28px;cursor:pointer}
 
-  .cards {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
-    margin-top: 40px; width: 100%; max-width: 720px;
-  }
-  .card {
-    background: var(--paper); border-radius: var(--radius); padding: 22px 12px;
-    box-shadow: var(--shadow); text-decoration: none; color: var(--ink);
-    transition: transform .25s, box-shadow .25s;
-    border: 1px solid rgba(200,161,90,.18);
-  }
-  .card:hover { transform: translateY(-6px); box-shadow: 0 16px 36px rgba(35,57,91,.16); }
-  .card .ico { font-size: 34px; }
-  .card .t { font-weight: 800; margin-top: 8px; }
-  .card .d { font-size: 13px; color: var(--muted); }
+  /* ---------- фото-заглушки ---------- */
+  .ph{position:relative;background:var(--sand-2);overflow:hidden;border-radius:var(--radius)}
+  .ph img{width:100%;height:100%;object-fit:cover}
+  .ph.noimg img{display:none}
+  .ph.noimg::after{content:"📷 сюда фото: " attr(data-file);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:14px;color:var(--muted);border:2px dashed var(--line);border-radius:var(--radius)}
+  .cap{font-size:13px;color:var(--muted);margin-top:8px;font-style:italic}
 
-  .waves { position: absolute; left: 0; bottom: 0; width: 100%; height: 110px; }
-  .boat { position: absolute; bottom: 62px; font-size: 34px; animation: sail 18s linear infinite; }
-  @keyframes sail {
-    0% { left: -60px; transform: rotate(-4deg); }
-    50% { transform: rotate(4deg); }
-    100% { left: 105%; transform: rotate(-4deg); }
-  }
+  /* ---------- шапка ---------- */
+  header.hero{position:relative;min-height:88vh;display:flex;align-items:flex-end;color:#fff;background:var(--sea)}
+  .hero .bg{position:absolute;inset:0;border-radius:0}
+  .hero .bg.noimg::after{color:#9fb3bf;border-color:#2c5168;align-items:flex-start;padding-top:90px;z-index:2}
+  .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,42,58,.15) 0%,rgba(15,42,58,.85) 75%);z-index:1}
+  .hero .wrap{position:relative;z-index:2;padding-bottom:70px;padding-top:120px}
+  .kicker{text-transform:uppercase;letter-spacing:.18em;font-size:13px;color:var(--amber-2);font-weight:600}
+  .hero h1{font-size:clamp(48px,9vw,104px);margin:10px 0 14px}
+  .hero p.lead{max-width:640px;font-size:clamp(17px,2.2vw,20px);color:#e4ecf0}
+  .btn{display:inline-block;margin-top:26px;padding:14px 26px;background:var(--amber);color:#fff;text-decoration:none;border-radius:40px;font-weight:600}
+  .btn:hover{background:#c27612}
 
-  /* ---------- NAV ---------- */
-  nav {
-    position: sticky; top: 0; z-index: 20;
-    display: flex; justify-content: center; gap: 8px; padding: 12px 16px;
-    background: rgba(251,246,240,.85); backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(200,161,90,.2);
-  }
-  nav a {
-    text-decoration: none; color: var(--navy); font-weight: 700; font-size: 14px;
-    padding: 8px 14px; border-radius: 999px; transition: background .2s;
-  }
-  nav a:hover { background: var(--rose); }
+  /* ---------- секции ---------- */
+  section{padding:90px 0}
+  .sec-title{font-size:clamp(36px,5vw,54px);margin-bottom:14px}
+  .sec-lead{max-width:720px;color:var(--muted);margin-bottom:44px}
 
-  /* ---------- SECTIONS ---------- */
-  section.block { padding: 80px 16px; max-width: 860px; margin: 0 auto; }
-  .head { text-align: center; margin-bottom: 36px; }
-  .head .num { color: var(--gold); font-weight: 800; letter-spacing: .2em; font-size: 13px; }
-  .head h2 { font-size: clamp(36px, 8vw, 52px); color: var(--navy); }
-  .head p { color: var(--muted); }
-  .divider { text-align: center; color: var(--gold); letter-spacing: .6em; opacity: .7; }
+  /* быстрые факты */
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:56px}
+  .fact{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
+  .fact b{display:block;font-family:"Cormorant Garamond",serif;font-size:38px;color:var(--sea);line-height:1}
+  .fact span{font-size:14px;color:var(--muted)}
 
-  /* ---------- QUIZ ---------- */
-  .quiz {
-    background: var(--paper); border-radius: 28px; box-shadow: var(--shadow);
-    padding: 28px; max-width: 620px; margin: 0 auto;
-    border: 1px solid rgba(200,161,90,.18);
-  }
-  .progress { height: 8px; background: #f1e7df; border-radius: 99px; overflow: hidden; }
-  .progress div { height: 100%; width: 0; background: linear-gradient(90deg, var(--rose), var(--rose-deep)); transition: width .5s; }
-  .qmeta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin: 10px 0 18px; font-weight: 700; }
-  .qphoto { width: 100%; max-height: 320px; object-fit: cover; border-radius: 18px; margin-bottom: 18px; }
-  .qtext { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; color: var(--navy); line-height: 1.2; margin-bottom: 18px; }
-  .opts { display: grid; gap: 10px; }
-  .opt {
-    text-align: left; padding: 14px 18px; border-radius: 16px; font-size: 16px; font-weight: 600;
-    background: var(--cream); color: var(--ink); border: 2px solid transparent;
-    transition: transform .15s, background .2s, border-color .2s;
-  }
-  .opt:hover:not(:disabled) { transform: translateX(4px); border-color: var(--rose); }
-  .opt.ok { background: #e3f3ea; border-color: var(--ok); }
-  .opt.bad { background: #fbe5e5; border-color: var(--bad); }
-  .opt:disabled { cursor: default; }
-  .opts.photos { grid-template-columns: repeat(3, 1fr); }
-  .opt.pic { padding: 6px; text-align: center; }
-  .opt.pic:hover:not(:disabled) { transform: scale(1.03); }
-  .opt.pic img, .opt.pic .empty {
-    width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; display: flex;
-    align-items: center; justify-content: center; color: var(--muted); font-weight: 700;
-    background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
-  }
-  .opt.pic span { display: block; margin-top: 6px; font-size: 14px; }
-  textarea.open {
-    width: 100%; min-height: 120px; padding: 14px 16px; border-radius: 16px; resize: vertical;
-    border: 2px solid var(--rose); background: var(--cream); font: inherit; font-size: 16px; color: var(--ink);
-  }
-  textarea.open:focus { outline: none; border-color: var(--rose-deep); }
-  .note { margin-top: 16px; padding: 14px 16px; border-radius: 16px; background: #fdf1e6; font-size: 15px; display: none; }
-  .btn {
-    display: inline-block; margin-top: 18px; padding: 14px 26px; border-radius: 999px;
-    background: var(--navy); color: #fff; font-weight: 800; font-size: 15px;
-    box-shadow: 0 8px 20px rgba(35,57,91,.25); transition: transform .2s; text-decoration: none;
-  }
-  .btn:hover { transform: translateY(-2px); }
-  .btn.rose { background: var(--rose-deep); box-shadow: 0 8px 20px rgba(201,112,122,.3); }
-  .result { text-align: center; }
-  .result .score { font-family: 'Cormorant Garamond', serif; font-size: 80px; color: var(--rose-deep); font-weight: 700; line-height: 1; }
+  /* вкладки о регионе */
+  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
+  .tab{border:1px solid var(--line);background:#fff;padding:9px 18px;border-radius:30px;cursor:pointer;font:600 15px "Manrope",sans-serif;color:var(--ink)}
+  .tab.active{background:var(--sea);color:#fff;border-color:var(--sea)}
+  .panel{display:none;grid-template-columns:1.1fr .9fr;gap:40px;align-items:start}
+  .panel.active{display:grid}
+  .panel h3{font-size:32px;margin-bottom:12px}
+  .panel p{margin-bottom:14px}
+  .panel ul{padding-left:20px;margin-bottom:14px}
+  .panel li{margin-bottom:6px}
+  .panel .ph{aspect-ratio:4/3}
 
-  /* ---------- GALLERY ---------- */
-  .gallery { columns: 3 220px; column-gap: 14px; }
-  .ph {
-    break-inside: avoid; margin-bottom: 14px; background: var(--paper); padding: 10px 10px 14px;
-    border-radius: 14px; box-shadow: var(--shadow); cursor: pointer; transition: transform .25s;
-  }
-  .ph:nth-child(odd) { transform: rotate(-1.2deg); }
-  .ph:nth-child(even) { transform: rotate(1.2deg); }
-  .ph:hover { transform: rotate(0) scale(1.03); }
-  .ph img { width: 100%; display: block; border-radius: 8px; }
-  .ph .empty {
-    aspect-ratio: 4/5; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-    background: repeating-linear-gradient(45deg, #f6ece4, #f6ece4 10px, #fbf3ec 10px, #fbf3ec 20px);
-    color: var(--muted); font-weight: 700;
-  }
-  .ph .ttl { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--navy); margin: 10px 4px 2px; line-height: 1.2; }
-  .ph .story { font-size: 14.5px; color: var(--ink); margin: 6px 4px 0; line-height: 1.5; }
-  .subhead { display: flex; align-items: center; gap: 14px; margin: 0 0 22px; }
-  .subhead::before, .subhead::after { content: ''; flex: 1; height: 1px; background: rgba(200,161,90,.45); }
-  .subhead span { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 28px; font-weight: 600; color: var(--rose-deep); white-space: nowrap; }
-  .subnote { text-align: center; color: var(--muted); margin: -12px 0 22px; font-size: 15px; }
-  .snaps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .snap {
-    aspect-ratio: 3/4; border-radius: 18px; overflow: hidden; cursor: pointer;
-    box-shadow: var(--shadow); border: 5px solid var(--paper);
-    transition: transform .3s, box-shadow .3s;
-  }
-  .snap:nth-child(3n+1) { transform: rotate(-1.5deg); }
-  .snap:nth-child(3n+2) { transform: translateY(10px) rotate(1deg); }
-  .snap:nth-child(3n) { transform: rotate(1.8deg); }
-  .snap:hover { transform: rotate(0) scale(1.05); box-shadow: 0 16px 36px rgba(35,57,91,.2); z-index: 2; position: relative; }
-  .snap img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
-  .snap:hover img { transform: scale(1.06); }
-  @media (max-width: 560px) { .snaps { grid-template-columns: repeat(2, 1fr); gap: 12px; } .snap:nth-child(n) { transform: rotate(0); } .snap:nth-child(odd) { transform: rotate(-1.2deg); } .snap:nth-child(even) { transform: translateY(12px) rotate(1.2deg); } }
-  .lightbox {
-    position: fixed; inset: 0; background: rgba(35,57,91,.88); z-index: 50;
-    display: none; align-items: center; justify-content: center; flex-direction: column; padding: 16px;
-  }
-  .lightbox.open { display: flex; }
-  .lightbox img { max-width: 100%; max-height: 80vh; border-radius: 14px; }
-  .lightbox img { max-height: 70vh; }
-  .lightbox .cap { color: #fff; margin-top: 14px; max-width: 620px; text-align: center; line-height: 1.5; max-height: 22vh; overflow-y: auto; }
+  /* выдающиеся жители */
+  .people{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .person{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px}
+  .person h4{font-family:"Cormorant Garamond",serif;font-size:24px;margin-bottom:2px}
+  .person .yrs{font-size:13px;color:var(--amber);font-weight:600;margin-bottom:8px}
+  .person p{font-size:15px;margin:0}
 
-  /* ---------- WISHES ---------- */
-  .envelope-wrap { text-align: center; }
-  .envelope {
-    width: 260px; height: 170px; margin: 0 auto; position: relative; cursor: pointer;
-    background: var(--rose); border-radius: 12px; box-shadow: var(--shadow);
-    transition: transform .3s;
-  }
-  .envelope:hover { transform: scale(1.04) rotate(-1deg); }
-  .envelope::before {
-    content: ''; position: absolute; left: 0; top: 0; width: 0; height: 0;
-    border-left: 130px solid transparent; border-right: 130px solid transparent;
-    border-top: 95px solid #eab1b1;
-  }
-  .seal {
-    position: absolute; left: 50%; top: 70px; transform: translateX(-50%);
-    width: 50px; height: 50px; border-radius: 50%; background: var(--rose-deep);
-    color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.15);
-  }
-  .letter {
-    display: none; background: var(--paper); border-radius: 24px; padding: 36px 28px;
-    box-shadow: var(--shadow); max-width: 620px; margin: 0 auto;
-    border: 1px solid rgba(200,161,90,.25);
-    background-image: linear-gradient(transparent 31px, rgba(169,207,224,.35) 32px);
-    background-size: 100% 32px;
-    animation: rise .8s ease;
-  }
-  @keyframes rise { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: none; } }
-  .letter h3 { font-size: 34px; color: var(--navy); margin-bottom: 10px; }
-  .letter p { font-size: 17px; line-height: 32px; margin-bottom: 0; }
-  .letter .sign { text-align: right; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 24px; color: var(--rose-deep); margin-top: 16px; }
+  /* ---------- маршрут ---------- */
+  #route{background:var(--sea);color:#e4ecf0}
+  #route .sec-title{color:#fff}
+  #route .sec-lead{color:#a9bcc7}
+  .route-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+  .route-meta div{background:var(--sea-2);border-radius:30px;padding:8px 16px;font-size:14px}
+  .route-meta b{color:var(--amber-2)}
+  #map{height:560px;border-radius:var(--radius);border:1px solid #2c5168}
+  .num-marker{background:var(--amber);color:#fff;border:2px solid #fff;border-radius:50%;width:30px!important;height:30px!important;display:flex!important;align-items:center;justify-content:center;font:700 14px "Manrope",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+  .leaflet-popup-content{font-family:"Manrope",sans-serif;font-size:14px}
+  .leaflet-popup-content b{font-size:15px}
+  .leaflet-popup-content a{color:var(--amber);font-weight:600}
 
-  footer { text-align: center; padding: 40px 16px 60px; color: var(--muted); font-size: 14px; }
+  /* ---------- остановки ---------- */
+  #stops{padding-top:70px}
+  .stop{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:56px 0;border-bottom:1px solid var(--line);scroll-margin-top:70px}
+  .stop:nth-child(even) .ph-col{order:2}
+  .stop .ph{aspect-ratio:4/3}
+  .stop-num{font-family:"Cormorant Garamond",serif;font-size:72px;color:var(--amber);line-height:1;font-weight:700}
+  .stop .place{text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--muted);font-weight:600;margin:6px 0 4px}
+  .stop h3{font-size:38px;margin-bottom:14px}
+  .stop p{margin-bottom:12px}
+  .why{background:#fff;border-left:4px solid var(--amber);padding:14px 18px;border-radius:0 10px 10px 0;font-size:15px;margin-top:14px}
+  .why b{color:var(--sea)}
+  .next{margin-top:16px;font-size:14px;color:var(--muted)}
+  .next::before{content:"→ ";color:var(--amber);font-weight:700}
 
-  canvas#confetti { position: fixed; inset: 0; pointer-events: none; z-index: 60; }
+  /* ---------- знаете ли вы ---------- */
+  #didyouknow{background:var(--sand-2)}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--line)}
+  .card .q{font-weight:700;margin-bottom:10px}
+  .card .a{display:none;color:var(--muted);font-size:15px}
+  .card.open .a{display:block}
+  .card button{margin-top:12px;background:none;border:1px solid var(--amber);color:var(--amber);padding:6px 14px;border-radius:20px;cursor:pointer;font:600 13px "Manrope",sans-serif}
 
-  @media (max-width: 560px) {
-    .cards { grid-template-columns: 1fr; max-width: 320px; }
-    .card { display: flex; align-items: center; gap: 14px; text-align: left; padding: 16px 18px; }
-    .card .t { margin-top: 0; }
-    .quiz { padding: 20px; }
-    .qtext { font-size: 24px; }
-    nav a { padding: 8px 10px; font-size: 13px; }
+  /* ---------- источники / подвал ---------- */
+  .sources{columns:2;column-gap:40px;font-size:15px}
+  .sources li{margin-bottom:8px;break-inside:avoid}
+  footer{background:var(--sea);color:#a9bcc7;padding:40px 0;font-size:14px}
+  footer b{color:#fff}
+
+  /* ---------- адаптив ---------- */
+  @media (max-width:900px){
+    .facts{grid-template-columns:repeat(2,1fr)}
+    .panel.active,.stop{grid-template-columns:1fr;gap:24px}
+    .stop:nth-child(even) .ph-col{order:0}
+    .people,.cards{grid-template-columns:1fr 1fr}
+    .sources{columns:1}
+    #map{height:440px}
+  }
+  @media (max-width:700px){
+    .menu{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:var(--sea);padding:16px 20px;gap:14px}
+    .menu.open{display:flex}
+    .burger{display:block}
+    .people,.cards{grid-template-columns:1fr}
+    section{padding:64px 0}
+    .stop h3{font-size:32px}
   }
 </style>
 </head>
 <body>
 
-<canvas id="confetti"></canvas>
-
-<!-- ================= HERO ================= -->
-<header class="hero">
-  <span class="float" style="top:10%;left:8%">🎹</span>
-  <span class="float" style="top:16%;right:10%;animation-delay:-2s">📚</span>
-  <span class="float" style="top:40%;left:5%;animation-delay:-4s">π</span>
-  <span class="float" style="top:34%;right:6%;animation-delay:-6s">👑</span>
-  <span class="float" style="top:62%;left:14%;animation-delay:-3s">♪</span>
-  <span class="float" style="top:58%;right:14%;animation-delay:-5s">∞</span>
-
-  <div class="date">01 · 10 · 2026</div>
-  <div class="age">18</div>
-  <h1>С днём рождения,<br><em>Лиза!</em></h1>
-  <p class="sub">Этот сайт сделан специально для тебя. Внутри три сюрприза, открывай по порядку ✨</p>
-
-  <div class="cards">
-    <a class="card" href="#quiz"><div class="ico">🧩</div><div><div class="t">Викторина</div><div class="d">Насколько хорошо ты помнишь нашу историю?</div></div></a>
-    <a class="card" href="#gallery"><div class="ico">📸</div><div><div class="t">Галерея</div><div class="d">Наши моменты</div></div></a>
-    <a class="card" href="#wishes"><div class="ico">💌</div><div><div class="t">Пожелания</div><div class="d">Письмо для тебя</div></div></a>
-  </div>
-
-  <span class="boat">⛵</span>
-  <svg class="waves" viewBox="0 0 1440 110" preserveAspectRatio="none">
-    <path fill="#a9cfe0" fill-opacity=".45" d="M0,60 C240,110 480,10 720,50 C960,90 1200,20 1440,60 L1440,110 L0,110 Z"/>
-    <path fill="#23395b" fill-opacity=".18" d="M0,80 C300,40 540,110 780,80 C1020,50 1260,100 1440,75 L1440,110 L0,110 Z"/>
-  </svg>
-</header>
-
 <nav>
-  <a href="#quiz">🧩 Викторина</a>
-  <a href="#gallery">📸 Галерея</a>
-  <a href="#wishes">💌 Пожелания</a>
+  <div class="wrap">
+    <a class="logo" href="#top">Янтарная <span>нить</span></a>
+    <button class="burger" aria-label="Меню" onclick="document.querySelector('.menu').classList.toggle('open')">☰</button>
+    <ul class="menu">
+      <li><a href="#region">О регионе</a></li>
+      <li><a href="#route">Карта маршрута</a></li>
+      <li><a href="#stops">Остановки</a></li>
+      <li><a href="#didyouknow">Знаете ли вы?</a></li>
+      <li><a href="#sources">Источники</a></li>
+    </ul>
+  </div>
 </nav>
 
-<!-- ================= 1. QUIZ ================= -->
-<section class="block" id="quiz">
-  <div class="head">
-    <div class="num">ЧАСТЬ I</div>
-    <h2>Викторина</h2>
-    <p>Проверим, насколько хорошо ты помнишь наши совместные моменты!</p>
+<!-- ================= ШАПКА ================= -->
+<header class="hero" id="top">
+  <div class="ph bg" data-file="images/hero.jpg">
+    <img src="images/hero.jpg" alt="Балтийское побережье Калининградской области" onerror="this.parentElement.classList.add('noimg')">
   </div>
-  <div class="quiz" id="quizBox"></div>
+  <div class="wrap">
+    <div class="kicker">Путеводитель · Калининградская область</div>
+    <h1>Янтарная нить</h1>
+    <p class="lead">13 остановок на западном краю России: от готического собора на острове Канта через янтарные берега Балтики к дюнам Куршской косы и мосту в Советске, где в 1807 году решалась судьба Европы.</p>
+    <a class="btn" href="#route">Смотреть маршрут</a>
+  </div>
+</header>
+
+<!-- ================= О РЕГИОНЕ ================= -->
+<section id="region">
+  <div class="wrap">
+    <h2 class="sec-title">Самый западный регион России</h2>
+    <p class="sec-lead">Калининградская область — эксклав: она отделена от остальной России территориями Литвы и Польши и выходит к Балтийскому морю. За 800 лет здесь сменились пруссы, Тевтонский орден, Пруссия и Германия, а с 1946 года это российская земля, на которой история нескольких эпох видна буквально на каждой улице.</p>
+
+    <div class="facts">
+      <div class="fact"><b>1946</b><span>год образования области (сначала Кёнигсбергская, с 4 июля — Калининградская)</span></div>
+      <div class="fact"><b>≈15,1 тыс. км²</b><span>площадь — один из самых маленьких регионов страны</span></div>
+      <div class="fact"><b>≈1 млн</b><span>жителей, около половины из них живут в Калининграде</span></div>
+      <div class="fact"><b>≈90%</b><span>разведанных мировых запасов янтаря</span></div>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab active" data-tab="geo">География</button>
+      <button class="tab" data-tab="hist">История</button>
+      <button class="tab" data-tab="eco">Экономика</button>
+      <button class="tab" data-tab="pop">Население и религия</button>
+      <button class="tab" data-tab="cult">Культура и традиции</button>
+    </div>
+
+    <div class="panel active" id="geo">
+      <div>
+        <h3>География и природа</h3>
+        <p>Область граничит с Литвой на севере и востоке и с Польшей на юге, а с запада её омывает Балтийское море. Большая часть территории — равнина, местами ниже уровня моря: польдерные земли в низовьях Немана осушали ещё со времён Тевтонского ордена.</p>
+        <p>Главные природные богатства побережья — две песчаные косы. <b>Куршская коса</b> длиной 98 км отделяет Куршский залив от моря, её российская часть — национальный парк и объект Всемирного наследия ЮНЕСКО (с 2000 года). <b>Балтийская коса</b> отделяет Калининградский (Вислинский) залив; на ней находится самая западная точка России.</p>
+        <p>Климат переходный от морского к умеренно-континентальному: мягкая зима, нежаркое лето, много осадков.</p>
+      </div>
+      <div>
+        <div class="ph" data-file="images/region-priroda.jpg"><img src="images/region-priroda.jpg" alt="Природа Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
+        <p class="cap">Подпишите, где сделано фото</p>
+      </div>
+    </div>
+
+    <div class="panel" id="hist">
+      <div>
+        <h3>Восемь веков в одной области</h3>
+        <ul>
+          <li><b>До XIII века</b> — земли балтского племени пруссов.</li>
+          <li><b>1255</b> — рыцари Тевтонского ордена основывают замок Кёнигсберг («Королевская гора»).</li>
+          <li><b>1525</b> — орденское государство становится светским герцогством Пруссия; в 1544 году основан университет Альбертина.</li>
+          <li><b>1701</b> — в Кёнигсберге коронуется первый прусский король Фридрих I.</li>
+          <li><b>1758–1762</b> — во время Семилетней войны Восточная Пруссия находится в составе Российской империи; её жители, в том числе Иммануил Кант, присягают императрице Елизавете Петровне.</li>
+          <li><b>Апрель 1945</b> — штурм Кёнигсберга войсками 3-го Белорусского фронта.</li>
+          <li><b>1945–1946</b> — по решению Потсдамской конференции северная часть Восточной Пруссии передана СССР, образована Калининградская область.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="ph" data-file="images/region-istoriya.jpg"><img src="images/region-istoriya.jpg" alt="Исторический Калининград" onerror="this.parentElement.classList.add('noimg')"></div>
+        <p class="cap">Подпишите, где сделано фото</p>
+      </div>
+    </div>
+
+    <div class="panel" id="eco">
+      <div>
+        <h3>Экономика и ресурсы</h3>
+        <p>С 1996 года в регионе действует <b>особая экономическая зона</b> — льготный режим, который должен компенсировать удалённость от основной части страны.</p>
+        <ul>
+          <li><b>Янтарь</b> — в посёлке Янтарный работает Калининградский янтарный комбинат, единственное в мире предприятие, добывающее янтарь в промышленном масштабе.</li>
+          <li><b>Машиностроение</b> — сборка автомобилей («Автотор»), судостроение (завод «Янтарь» строит корабли для флота).</li>
+          <li><b>Рыболовство и переработка рыбы</b>, морские порты Калининград и Балтийск.</li>
+          <li><b>Сельское хозяйство</b> на плодородных осушенных землях.</li>
+          <li><b>Туризм</b> — курорты Светлогорск и Зеленоградск, Куршская коса и сам Калининград ежегодно принимают более миллиона туристов.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="ph" data-file="images/region-yantar.jpg"><img src="images/region-yantar.jpg" alt="Янтарь" onerror="this.parentElement.classList.add('noimg')"></div>
+        <p class="cap">Например, ваше фото янтаря или изделий из него</p>
+      </div>
+    </div>
+
+    <div class="panel" id="pop">
+      <div>
+        <h3>Население и религия</h3>
+        <p>После 1945 года немецкое население было выселено, и область заново заселили переселенцы со всего Советского Союза — из России, Белоруссии, Украины, Поволжья. Поэтому Калининградская область — регион без «коренного» местного говора и очень смешанный по происхождению жителей.</p>
+        <p>Большинство верующих — православные. Главный храм — <b>Храм Христа Спасителя</b> на площади Победы, освящённый в 2006 году. Многие бывшие лютеранские и католические кирхи сегодня отданы Русской православной церкви или служат концертными залами, например бывшая кирха Святого Семейства — сейчас Калининградская филармония. Действуют также католические и лютеранские приходы, синагога, восстановленная в 2018 году на историческом месте.</p>
+      </div>
+      <div>
+        <div class="ph" data-file="images/region-hram.jpg"><img src="images/region-hram.jpg" alt="Храм Христа Спасителя в Калининграде" onerror="this.parentElement.classList.add('noimg')"></div>
+        <p class="cap">Храм Христа Спасителя на площади Победы</p>
+      </div>
+    </div>
+
+    <div class="panel" id="cult">
+      <div>
+        <h3>Культура и традиции</h3>
+        <p>Узнаваемый облик региона — красный кирпич, черепичные крыши, брусчатка и аллеи старых деревьев вдоль дорог. Здесь сохранилось больше сотни орденских замков, кирх и фортов.</p>
+        <ul>
+          <li><b>Янтарные промыслы</b> — резьба по янтарю, ювелирные мастерские, музей янтаря.</li>
+          <li><b>Кухня</b> — балтийская рыба (копчёный угорь, салака, корюшка), клопсы — кёнигсбергские мясные тефтели в соусе с каперсами, марципан.</li>
+          <li><b>Фестивали</b> — джазовый Kaliningrad City Jazz, «Кантовские чтения», праздник корюшки.</li>
+          <li><b>Кант</b> — имя философа носит университет (БФУ им. И. Канта), а остров, где он похоронен, называют островом Канта.</li>
+        </ul>
+      </div>
+      <div>
+        <div class="ph" data-file="images/region-kultura.jpg"><img src="images/region-kultura.jpg" alt="Культура Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
+        <p class="cap">Подпишите, где сделано фото</p>
+      </div>
+    </div>
+
+    <h3 style="font-size:34px;margin:64px 0 18px">Выдающиеся жители</h3>
+    <div class="people">
+      <div class="person"><h4>Иммануил Кант</h4><div class="yrs">1724–1804</div><p>Философ, основатель немецкой классической философии. Почти всю жизнь прожил в Кёнигсберге, похоронен у Кафедрального собора.</p></div>
+      <div class="person"><h4>Э. Т. А. Гофман</h4><div class="yrs">1776–1822</div><p>Писатель-романтик, автор «Щелкунчика и Мышиного короля». Родился и учился в Кёнигсберге.</p></div>
+      <div class="person"><h4>Давид Гильберт</h4><div class="yrs">1862–1943</div><p>Один из величайших математиков XX века, уроженец Кёнигсберга, выпускник местного университета.</p></div>
+      <div class="person"><h4>Кристионас Донелайтис</h4><div class="yrs">1714–1780</div><p>Основоположник литовской художественной литературы, автор поэмы «Времена года». Служил пастором в Тольминкемисе — ныне посёлок Чистые Пруды, где открыт его музей.</p></div>
+      <div class="person"><h4>Кете Кольвиц</h4><div class="yrs">1867–1945</div><p>Художница и график, родилась в Кёнигсберге. Её работы — о войне, бедности и материнстве.</p></div>
+      <div class="person"><h4>Леонард Эйлер</h4><div class="yrs">связан с городом</div><p>Не жил здесь, но решил задачу о <b>семи мостах Кёнигсберга</b> (1736) — с неё началась теория графов. Мосты стояли вокруг острова Канта.</p></div>
+    </div>
+  </div>
 </section>
 
-<div class="divider">♛ ♪ ⛵</div>
-
-<!-- ================= 2. GALLERY ================= -->
-<section class="block" id="gallery">
-  <div class="head">
-    <div class="num">ЧАСТЬ II</div>
-    <h2>Наша галерея</h2>
-    <p>Нажми на фото, чтобы открыть</p>
-  </div>
-  <div class="subhead"><span>Наши истории</span></div>
-  <div class="gallery" id="galleryBox"></div>
-  <div class="subhead" style="margin-top:56px"><span>А тут просто фоточки ✨</span></div>
-  <p class="subnote">Без слов, и так всё понятно</p>
-  <div class="snaps" id="snapsBox"></div>
-</section>
-
-<div class="divider">♛ ♪ ⛵</div>
-
-<!-- ================= 3. WISHES ================= -->
-<section class="block" id="wishes">
-  <div class="head">
-    <div class="num">ЧАСТЬ III</div>
-    <h2>Пожелания</h2>
-    <p>Нажми на конверт</p>
-  </div>
-  <div class="envelope-wrap" id="envWrap">
-    <div class="envelope" id="envelope"><div class="seal">♛</div></div>
-  </div>
-  <div class="letter" id="letter">
-    <h3>Дорогая Лиза,</h3>
-    <p>[Здесь будет твоё поздравление. Пришли мне текст, и я красиво вставлю его сюда.]</p>
-    <p>[Можно несколько абзацев.]</p>
-    <div class="sign">Твой Бобик</div>
+<!-- ================= МАРШРУТ ================= -->
+<section id="route">
+  <div class="wrap">
+    <h2 class="sec-title">Карта маршрута</h2>
+    <p class="sec-lead">Маршрут нанизан на одну «нить»: мы идём от Средневековья к сегодняшнему дню и от города к морю. Сначала — история Кёнигсберга и его превращение в Калининград, затем янтарное побережье, где формировалось богатство края, и в конце — природа Куршской косы и граница на Немане. Нажмите на точку, чтобы перейти к описанию.</p>
+    <div class="route-meta">
+      <div><b>13</b> остановок</div>
+      <div>≈ <b>430 км</b> пути</div>
+      <div><b>3–4</b> дня на машине</div>
+      <div>лучшее время: <b>май — сентябрь</b></div>
+    </div>
+    <div id="map"></div>
   </div>
 </section>
 
-<footer>Сделано специально для Лизы · 2026</footer>
+<!-- ================= ОСТАНОВКИ ================= -->
+<section id="stops">
+  <div class="wrap" id="stops-list"></div>
+</section>
 
-<div class="lightbox" id="lightbox"><img id="lbImg" alt=""><div class="cap" id="lbCap"></div></div>
+<!-- ================= ЗНАЕТЕ ЛИ ВЫ ================= -->
+<section id="didyouknow">
+  <div class="wrap">
+    <h2 class="sec-title">Знаете ли вы?</h2>
+    <p class="sec-lead">Проверьте себя — нажмите «Ответ».</p>
+    <div class="cards">
+      <div class="card"><div class="q">Почему Куршская коса называется «куршской»?</div><div class="a">По имени балтского племени куршей, жившего на этих берегах в Средние века.</div><button>Ответ</button></div>
+      <div class="card"><div class="q">Сколько лет янтарю, который добывают в Янтарном?</div><div class="a">Около 35–45 миллионов лет. Это окаменевшая смола хвойных деревьев, росших в эпоху эоцена.</div><button>Ответ</button></div>
+      <div class="card"><div class="q">Как называлась область в первые три месяца?</div><div class="a">Кёнигсбергская. 4 июля 1946 года город переименовали в Калининград в честь М. И. Калинина, а вслед за ним и область.</div><button>Ответ</button></div>
+      <div class="card"><div class="q">Можно ли пройти по всем семи мостам Кёнигсберга, побывав на каждом ровно один раз?</div><div class="a">Нет. Эйлер доказал это в 1736 году — и тем самым заложил основы теории графов.</div><button>Ответ</button></div>
+      <div class="card"><div class="q">Где находится самая западная точка России?</div><div class="a">На Балтийской косе, на границе с Польшей, недалеко от Балтийска.</div><button>Ответ</button></div>
+      <div class="card"><div class="q">Что общего у Советска и сыра?</div><div class="a">Советск до 1946 года назывался Тильзитом — отсюда название «тильзитского» сыра, который здесь начали варить в XIX веке.</div><button>Ответ</button></div>
+    </div>
+  </div>
+</section>
 
+<!-- ================= ИСТОЧНИКИ ================= -->
+<section id="sources">
+  <div class="wrap">
+    <h2 class="sec-title">Источники и полезные ссылки</h2>
+    <ul class="sources">
+      <li><a href="https://visit-kaliningrad.ru/" target="_blank" rel="noopener">Туристический портал Калининградской области</a></li>
+      <li><a href="https://whc.unesco.org/ru/list/994" target="_blank" rel="noopener">ЮНЕСКО: Куршская коса</a></li>
+      <li><a href="https://park-kosa.ru/" target="_blank" rel="noopener">Национальный парк «Куршская коса»</a></li>
+      <li><a href="https://world-ocean.ru/" target="_blank" rel="noopener">Музей Мирового океана</a></li>
+      <li><a href="https://ambermuseum.ru/" target="_blank" rel="noopener">Музей янтаря</a></li>
+      <li><a href="https://sobor-kaliningrad.ru/" target="_blank" rel="noopener">Кафедральный собор</a></li>
+      <li><a href="https://kantiana.ru/" target="_blank" rel="noopener">БФУ им. Иммануила Канта</a></li>
+      <li><a href="https://ru.wikipedia.org/wiki/Калининградская_область" target="_blank" rel="noopener">Калининградская область — Википедия</a></li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><b>«Янтарная нить»</b> — проект по курсу «Основы российской государственности». Авторы: <b>Имя Фамилия, Имя Фамилия, Имя Фамилия</b>. Фотографии — авторские.</p>
+  </div>
+</footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ============================================================
-   ВОПРОСЫ ВИКТОРИНЫ
-   answer — номер правильного варианта, считая с 0
-   type: "photo" — варианты-картинки, "open" — свободный ответ
-   ============================================================ */
-const QUESTIONS = [
+/* ===== ДАННЫЕ ОСТАНОВОК =====
+   photo — имя файла в папке images/ */
+const stops = [
   {
-    q: "Как полностью зовут родителей Данька?",
-    options: [
-      "Владимир Юрьевич и Юлия Игоревна",
-      "Владимир Николаевич и Юлия Игоревна",
-      "Вячеслав Юрьевич и Юлия Ильинична",
-      "Владимир Игоревич и Юлия Юрьевна"
+    id:"sobor", photo:"01-kafedralnyj-sobor.jpg", lat:54.7066, lng:20.5118,
+    title:"Кафедральный собор и могила Канта", place:"Калининград, остров Канта",
+    text:[
+      "Точка, с которой начинается история города. Собор строился в 1333–1380 годах на острове Кнайпхоф, одном из трёх средневековых городов, которые в 1724 году объединились в Кёнигсберг. Здесь короновались и были погребены герцоги Пруссии.",
+      "В 1945 году собор сгорел и полвека стоял руинами. Восстановлен в 1990–2000-х годах; сейчас в нём музей и концертный зал с крупнейшим в России органным комплексом. У северо-восточного угла — могила Иммануила Канта, одно из немногих немецких захоронений, которые бережно сохранялись и в советское время."
     ],
-    answer: 0,
-    note: "Владимир Юрьевич и Юлия Игоревна. Надеюсь, ты не забыла)"
+    why:"Символ преемственности: памятник немецкой готики, восстановленный в российском Калининграде, где покоится философ, когда-то бывший подданным Российской империи.",
+    next:"Через бывшие кварталы старого города идём к Королевским воротам — около 2 км."
   },
   {
-    q: "Как мы впервые познакомились?",
-    options: [
-      "На БЗС",
-      "На пьянке у Совбака",
-      "На уроках матана у нашего любимого Зубика",
-      "В очереди в столовой"
+    id:"vorota", photo:"02-korolevskie-vorota.jpg", lat:54.7176, lng:20.5340,
+    title:"Королевские ворота", place:"Калининград, ул. Фрунзе",
+    text:[
+      "Одни из семи сохранившихся городских ворот Кёнигсберга, построенные в 1843–1850 годах как часть городских укреплений. На фасаде — скульптуры чешского короля Оттокара II Пржемысла, в честь которого, по преданию, назван город, первого прусского короля Фридриха I и герцога Альбрехта.",
+      "Ворота отреставрировали к 750-летию города в 2005 году. Сегодня внутри — музей «Великое посольство», рассказывающий о визите Петра I в Кёнигсберг в 1697 году."
     ],
-    answer: 2,
-    note: "Ну у кого, как не у Алексея Борисовича, ахахаха"
+    why:"Связь с российской историей: молодой царь Пётр I учился в Кёнигсберге артиллерийскому делу задолго до того, как город стал частью России.",
+    next:"По бульварам вдоль прудов — к башне Дона, около 1,5 км."
   },
   {
-    q: "После какого мероприятия я впервые пошёл тебя провожать?",
-    options: [
-      "После олимпиады по математике",
-      "После наших посиделок в ЦР",
-      "После концерта в музыкалке",
-      "После выпускного"
+    id:"amber-museum", photo:"03-muzej-yantarya.jpg", lat:54.7209, lng:20.5222,
+    title:"Музей янтаря в башне Дона", place:"Калининград, площадь Маршала Василевского",
+    text:[
+      "Музей открыт в 1979 году в оборонительной башне Дона, построенной в середине XIX века и названной в честь прусского генерала Фридриха цу Дона. В коллекции — тысячи образцов: от янтаря с застывшими насекомыми и растениями возрастом около 40 млн лет до ювелирных изделий и копий фрагментов Янтарной комнаты.",
+      "Здесь начинается «янтарная» линия маршрута: мы узнаём, что такое янтарь, а через несколько остановок увидим, где его добывают."
     ],
-    answer: 1,
-    note: "Посиделки в ЦР))))"
+    why:"Янтарь — главный природный символ региона и его «визитная карточка» для всей России.",
+    next:"Едем к набережной Петра Великого на реке Преголя — около 3 км."
   },
   {
-    q: "Какую дату можно назвать началом наших отношений?",
-    options: ["1 апреля", "16 апреля", "16 мая", "14 февраля"],
-    answer: 1,
-    note: "16 апреля — день, с которого всё началось 💛"
+    id:"ocean", photo:"04-muzej-mirovogo-okeana.jpg", lat:54.7063, lng:20.4994,
+    title:"Музей Мирового океана", place:"Калининград, наб. Петра Великого",
+    text:[
+      "Один из крупнейших морских музеев России, основан в 1990 году. У его причала стоят научно-исследовательское судно «Витязь», которое в 1957 году измерило глубину Марианской впадины, и подводная лодка Б-413.",
+      "Музей рассказывает о море как о главной «дороге» Калининградской области: через Балтику идут грузы, здесь базируется флот и работают рыбаки."
+    ],
+    why:"Показывает морское значение региона для страны: незамерзающие порты и выход России к Балтике.",
+    next:"Выезжаем на северо-западную окраину города к форту № 5 — около 6 км."
   },
   {
-    q: "Сколько длился наш самый долгий телефонный звонок?",
-    options: ["Около часа", "2–3 часа", "Ровно 4 часа", "Больше 5 часов"],
-    answer: 3,
-    note: "Больше 5 часов точно, если я не ошибаюсь кнч) 📞"
+    id:"fort5", photo:"05-fort-5.jpg", lat:54.7343, lng:20.4247,
+    title:"Форт № 5 «Король Фридрих Вильгельм III»", place:"Калининград, ул. Калужская",
+    text:[
+      "Один из фортов «Ночного пояса», которым во второй половине XIX века окружили Кёнигсберг. В апреле 1945 года форт стал одним из самых упорных узлов обороны: его штурмовали несколько дней, и 8 апреля он пал. Многие участники штурма получили звание Героя Советского Союза.",
+      "Сейчас здесь историко-мемориальный комплекс с мемориалом «Штурм Кёнигсберга» и экспозицией военной техники."
+    ],
+    why:"Место памяти о цене, которой досталась эта земля, и о том, как Кёнигсберг стал Калининградом.",
+    next:"Едем вдоль залива на юго-запад к руинам замка Бальга — около 45 км."
   },
   {
-    type: "photo",
-    q: "Какая наша совместная фотка из этих трёх — моя любимая?",
-    options: ["fav1.jpg", "fav2.jpg", "fav3.jpg"],
-    answer: 1,
-    note: "Эта фотка отражает самое начало наших отношений. Она, можно сказать, одна из первых, но именно она по-настоящему запала мне в душу. Твоя улыбка тут просто неповторима! ❤️"
+    id:"balga", photo:"06-zamok-balga.jpg", lat:54.5583, lng:20.2044,
+    title:"Замок Бальга", place:"Багратионовский район, пос. Весёлое",
+    text:[
+      "Руины первого каменного замка Тевтонского ордена на этой земле — его начали строить в 1239 году, на 16 лет раньше Кёнигсберга. Замок стоит на высоком берегу Калининградского залива, с которого видна Балтийская коса.",
+      "Именно отсюда орден вёл завоевание прусских земель; позже замок служил резиденцией комтура. До наших дней дошли фрагменты башни и стен."
+    ],
+    why:"Отправная точка всей немецкой истории региона — до её начала край принадлежал пруссам.",
+    next:"Огибаем залив и едем в Балтийск — около 70 км."
   },
   {
-    q: "Через сколько моих кружочков в ТГ ты отправила свой первый?",
-    options: ["Через 1", "Через 3", "Через 5", "Через целых 7"],
-    answer: 3,
-    note: "Целых 7 Лиз, это просто ....."
+    id:"baltiysk", photo:"07-baltijsk.jpg", lat:54.6431, lng:19.8932,
+    title:"Балтийск — самый западный город России", place:"Балтийский городской округ",
+    text:[
+      "Бывший Пиллау — город-крепость у пролива, соединяющего Калининградский залив с Балтийским морем. Здесь сохранились звёздчатая цитадель XVII века и маяк 1816 года.",
+      "Сегодня Балтийск — главная база Балтийского флота России. На набережной стоят памятник Петру I и конный памятник императрице Елизавете Петровне — в её правление Пиллау уже был частью Российской империи."
+    ],
+    why:"Стратегическое значение для России: незамерзающая военно-морская база на Балтике.",
+    next:"По побережью на север, в посёлок Янтарный — около 30 км."
   },
   {
-    q: "Сколько у нас с тобой сообщений в ТГ?",
-    options: ["15–20 тысяч", "28–30 тысяч", "43–44 тысячи", "60–65 тысяч"],
-    answer: 2,
-    note: "43–44 тысячи, и это число растёт каждый день ❤️"
+    id:"yantarny", photo:"08-yantarnyj.jpg", lat:54.8702, lng:19.9419,
+    title:"Посёлок Янтарный и янтарный карьер", place:"Янтарный городской округ",
+    text:[
+      "Здесь находится Приморское месторождение, где сосредоточено около 90% разведанных мировых запасов янтаря. Калининградский янтарный комбинат ведёт добычу открытым способом; к карьеру есть смотровая площадка.",
+      "Сам посёлок (до 1946 года — Пальмникен) — тихий курорт с одним из лучших пляжей Балтики и парком Беккера, названным в честь промышленника, наладившего здесь добычу янтаря в XIX веке."
+    ],
+    why:"Уникальный для мира ресурс: связь с музеем янтаря из остановки № 3 — там мы видели результат, здесь видим источник.",
+    next:"По морскому берегу в Светлогорск — около 25 км."
   },
   {
-    type: "open",
-    q: "Какое событие, на котором мы были вместе, запомнилось тебе больше всего?",
-    note: "Может быть что угодно: хоть прогулка, хоть выпускной"
+    id:"svetlogorsk", photo:"09-svetlogorsk.jpg", lat:54.9426, lng:20.1522,
+    title:"Светлогорск", place:"Светлогорский городской округ",
+    text:[
+      "Бывший Раушен — курорт с начала XIX века. Город стоит на высоком лесистом берегу, к пляжу спускаются лифт и лестницы, а внизу тянется променад.",
+      "Здесь сохранилась застройка курортных вилл начала XX века, водолечебница с башней в стиле модерн и органный зал. Летом на набережной — один из самых красивых закатов на Балтике."
+    ],
+    why:"Пример того, как исторический курорт стал частью российской курортной традиции — сюда едут отдыхать со всей страны.",
+    next:"Вдоль моря на восток в Зеленоградск — около 25 км."
   },
   {
-    q: "Сколько часов каждый день ты должна спать?",
-    options: ["5", "6", "7", "8", "9", "10"],
-    answer: 5,
-    note: "10!!! И это не обсуждается 😴"
+    id:"zelenogradsk", photo:"10-zelenogradsk.jpg", lat:54.9592, lng:20.4801,
+    title:"Зеленоградск — город кошек", place:"Зеленоградский муниципальный округ",
+    text:[
+      "Бывший Кранц — курорт, где отдыхали жители Кёнигсберга. Сегодня здесь длинный променад, черепичные крыши и десятки скульптур кошек, а в старой водонапорной башне работает музей кошек «Мурариум» — кошки стали символом города.",
+      "Зеленоградск — «ворота» на Куршскую косу, отсюда начинается дорога в национальный парк."
+    ],
+    why:"Современная жизнь региона: старый курорт, получивший новый образ и ставший одним из самых популярных мест отдыха.",
+    next:"Въезжаем на Куршскую косу и едем до 37-го километра — около 40 км."
+  },
+  {
+    id:"dancing-forest", photo:"11-tancuyushchij-les.jpg", lat:55.1813, lng:20.8628,
+    title:"«Танцующий лес»", place:"Куршская коса, 37-й км",
+    text:[
+      "Сосны в этом лесу закручены в кольца, спирали и петли. Деревья высадили в 1960-х годах на дюне Круглой для укрепления песков, и почему они растут так причудливо, до конца не ясно: среди версий — ветер, неустойчивый песок и гусеница-вредитель, повреждающая молодые побеги.",
+      "Рядом в посёлке Рыбачий находится орнитологическая станция «Фрингилла»: в 1901 году здесь открыли первую в мире станцию кольцевания птиц. Над косой проходит один из главных путей миграции птиц в Европе."
+    ],
+    why:"Природное наследие мирового значения: коса — объект ЮНЕСКО, созданный и природой, и трудом людей, укреплявших дюны.",
+    next:"Дальше по косе к высоте Эфа — около 10 км."
+  },
+  {
+    id:"efa", photo:"12-vysota-efa.jpg", lat:55.2667, lng:20.9584,
+    title:"Высота Эфа", place:"Куршская коса, 42-й км",
+    text:[
+      "Одна из самых высоких точек косы — дюна высотой около 60 метров, названная в честь Франца Эфы, который в XIX веке руководил работами по закреплению подвижных песков. По деревянной тропе можно подняться к смотровым площадкам: с одной стороны — Балтийское море, с другой — Куршский залив и «песчаная пустыня».",
+      "Двигаясь, дюны в прошлом засыпали несколько рыбацких деревень, и только посадки леса остановили пески."
+    ],
+    why:"Самый наглядный пример борьбы человека с природой и её сохранения — вершина «природной» части маршрута.",
+    next:"Возвращаемся на материк и едем на восток, к Неману, в Советск — около 170 км."
+  },
+  {
+    id:"sovetsk", photo:"13-sovetsk-most-luizy.jpg", lat:55.0846, lng:21.8869,
+    title:"Советск и мост королевы Луизы", place:"Советский городской округ",
+    text:[
+      "Бывший Тильзит. В 1807 году на плоту посреди Немана здесь встретились Александр I и Наполеон, а затем был подписан Тильзитский мир — один из ключевых договоров эпохи наполеоновских войн.",
+      "Мост королевы Луизы через Неман открыт в 1907 году; от него сохранился портал с гербом Луизы. Сегодня мост ведёт к пограничному переходу в Литву. В городе стоит памятник в честь Тильзитского мира, а ещё отсюда родом знаменитый тильзитский сыр."
+    ],
+    why:"Финал маршрута: место, где решалась судьба Европы, а сегодня проходит граница России. Отсюда нить связывает историю региона с большой историей страны.",
+    next:"Конец маршрута. Обратно в Калининград — около 120 км."
   }
 ];
 
-/* ---------------- QUIZ LOGIC ---------------- */
-const quizBox = document.getElementById('quizBox');
-const GRADED = QUESTIONS.filter(x => x.type !== 'open').length;
-let current = 0, score = 0;
+/* ===== СТРОИМ КАРТОЧКИ ОСТАНОВОК ===== */
+const list = document.getElementById('stops-list');
+list.innerHTML = '<h2 class="sec-title">Остановки маршрута</h2>' + stops.map((s,i)=>`
+  <article class="stop" id="${s.id}">
+    <div class="ph-col">
+      <div class="ph" data-file="images/${s.photo}">
+        <img src="images/${s.photo}" alt="${s.title}" onerror="this.parentElement.classList.add('noimg')">
+      </div>
+    </div>
+    <div>
+      <div class="stop-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="place">${s.place}</div>
+      <h3>${s.title}</h3>
+      ${s.text.map(p=>`<p>${p}</p>`).join('')}
+      <div class="why"><b>Почему это важно:</b> ${s.why}</div>
+      <div class="next">${s.next}</div>
+    </div>
+  </article>`).join('');
 
-function header() {
-  const pct = (current / QUESTIONS.length) * 100;
-  return `
-    <div class="progress"><div style="width:${pct}%"></div></div>
-    <div class="qmeta"><span>Вопрос ${current + 1} из ${QUESTIONS.length}</span><span>Очки: ${score}</span></div>`;
-}
+/* ===== КАРТА ===== */
+if (window.L) {
+const map = L.map('map',{scrollWheelZoom:false}).setView([54.85,20.6],9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
+  maxZoom:18, attribution:'&copy; участники OpenStreetMap'
+}).addTo(map);
 
-function renderQuestion() {
-  const item = QUESTIONS[current];
+const pts = stops.map(s=>[s.lat,s.lng]);
+L.polyline(pts,{color:'#d98a1c',weight:3,dashArray:'6 8'}).addTo(map);
 
-  if (item.type === 'open') {
-    quizBox.innerHTML = `${header()}
-      <div class="qtext">${item.q}</div>
-      <p style="color:var(--muted);margin:-8px 0 14px">${item.note || ''}</p>
-      <textarea class="open" id="openAns" placeholder="Напиши здесь…"></textarea>
-      <div class="note" id="note"></div>
-      <div id="nextWrap"><button class="btn rose" id="sendBtn">Ответить</button></div>`;
-    document.getElementById('sendBtn').onclick = () => {
-      const text = document.getElementById('openAns').value.trim();
-      if (!text) { document.getElementById('openAns').focus(); return; }
-      document.getElementById('openAns').disabled = true;
-      const note = document.getElementById('note');
-      note.textContent = 'Какой классный ответ! Этот вопрос без правильного ответа, тут любой засчитывается 💛';
-      note.style.display = 'block';
-      burst(40);
-      const share = 'https://t.me/share/url?url=' + encodeURIComponent(location.href) +
-        '&text=' + encodeURIComponent('Мой ответ на вопрос «' + item.q + '»: ' + text);
-      document.getElementById('nextWrap').innerHTML = `
-        <a class="btn" style="background:#2aa3d9" href="${share}" target="_blank">Отправить ответ в Telegram ✈️</a>
-        <button class="btn" id="nextBtn" style="margin-left:6px">Дальше →</button>`;
-      document.getElementById('nextBtn').onclick = next;
-    };
-    return;
-  }
-
-  const isPhoto = item.type === 'photo';
-  const opts = item.options.map((o, i) => isPhoto
-    ? `<button class="opt pic" data-i="${i}"><img src="${o}" alt="" onerror="this.outerHTML='<div class=&quot;empty&quot;>фото ${i + 1}</div>'"><span>№${i + 1}</span></button>`
-    : `<button class="opt" data-i="${i}">${o}</button>`).join('');
-
-  quizBox.innerHTML = `${header()}
-    ${item.photo ? `<img class="qphoto" src="${item.photo}" alt="">` : ''}
-    <div class="qtext">${item.q}</div>
-    <div class="opts${isPhoto ? ' photos' : ''}">${opts}</div>
-    <div class="note" id="note"></div>
-    <div id="nextWrap"></div>`;
-  quizBox.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => choose(+b.dataset.i)));
-}
-
-function choose(i) {
-  const item = QUESTIONS[current];
-  const btns = quizBox.querySelectorAll('.opt');
-  btns.forEach(b => b.disabled = true);
-  btns[item.answer].classList.add('ok');
-  if (i === item.answer) { score++; burst(40); }
-  else btns[i].classList.add('bad');
-  const note = document.getElementById('note');
-  note.textContent = (i === item.answer ? 'Верно! ' : 'Не совсем. ') + (item.note || '');
-  note.style.display = 'block';
-  const last = current === QUESTIONS.length - 1;
-  document.getElementById('nextWrap').innerHTML =
-    `<button class="btn" id="nextBtn">${last ? 'Узнать результат' : 'Дальше →'}</button>`;
-  document.getElementById('nextBtn').onclick = next;
-}
-
-function next() {
-  current++;
-  current >= QUESTIONS.length ? renderResult() : renderQuestion();
-  document.getElementById('quiz').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
-function renderResult() {
-  const total = GRADED;
-  let msg = 'Идеально! Ты помнишь всё 🥹';
-  if (score < total) msg = 'Почти идеально! Остальное вспомним вместе 😊';
-  if (score < total / 2) msg = 'Кажется, пора устроить вечер воспоминаний 😄';
-  quizBox.innerHTML = `
-    <div class="progress"><div style="width:100%"></div></div>
-    <div class="result" style="margin-top:24px">
-      <div class="score">${score}/${total}</div>
-      <p style="font-size:18px;margin-top:10px">${msg}</p>
-      <a class="btn rose" href="#gallery">Дальше: галерея 📸</a><br>
-      <button class="btn" style="background:transparent;color:var(--navy);box-shadow:none" id="again">Пройти ещё раз</button>
-    </div>`;
-  document.getElementById('again').onclick = () => { current = 0; score = 0; renderQuestion(); };
-  burst(180);
-}
-renderQuestion();
-
-/* ============================================================
-   ФОТО ДЛЯ ГАЛЕРЕИ
-   src   — имя файла фотки (не трогай)
-   title — короткий заголовок (можно оставить пустым: "")
-   story — твоя мини-история. Пиши текст МЕЖДУ кавычками "…".
-           Если внутри текста нужны кавычки, используй «ёлочки».
-   ============================================================ */
-const PHOTOS = [
-  {
-    src: "g1.jpg",
-    title: "Лицейййййй",
-    story: "Надо сказать спасибо Вике за эту фотку. Я не мог её не добавить, ведь именно в стенах лицея мы и познакомились!"
-  },
-  {
-    src: "g2.jpg",
-    title: "Вручение аттестатов",
-    story: "Ой, тут было вообще много эмоций! Помню, как ты подходил знакомиться к папе и маме, эту неловкость было не передать словами. Ну и конечно, когда тебе вручали серебряную м…"
-  },
-  {
-    src: "g3.jpg",
-    title: "Дачка и ДР",
-    story: "Тоже невероятно памятная поездка. Между прочим, первая дача, на которую тебя отпустили одну вместе со мной)"
-  },
-  {
-    src: "g4.jpg",
-    title: "Граф Орлов",
-    story: "На этой фотке я просто обожаю твой наряд, он ужасно секси 😏, аххаххахах"
-  },
-  {
-    src: "g5.jpg",
-    title: "Архангельское",
-    story: "Это та самая поездка, которую организовала полностью ты, и она получилась бесподобной, а я просто ходил за тобой и кайфовал)"
-  },
-  {
-    src: "g6.jpg",
-    title: "Опять лицей, хехехе",
-    story: "ОООООО, это вообще топ фотка, одна из наших первых, мы тут на дрилеееееее, аххахах"
-  },
-  {
-    src: "g7.jpg",
-    title: "Оп-оп, баскетбольчик",
-    story: "Мы тут просто няшные)))"
-  }
-];
-
-/* ============================================================
-   ПРОСТО ФОТКИ (вторая часть галереи, без подписей)
-   Чтобы добавить фото: загрузи его на GitHub и допиши имя в список
-   ============================================================ */
-const SNAPS = ["p1.jpg", "p2.jpg", "p3.jpg", "p4.jpg", "p5.jpg", "p6.jpeg", "p7.jpg"];
-
-/* ---------------- GALLERY LOGIC ---------------- */
-const galleryBox = document.getElementById('galleryBox');
-const lb = document.getElementById('lightbox');
-PHOTOS.forEach((p, n) => {
-  const el = document.createElement('div');
-  el.className = 'ph';
-  el.innerHTML = `<img src="${p.src}" alt="" loading="lazy">
-    ${p.title ? `<div class="ttl">${p.title}</div>` : ''}
-    ${p.story ? `<div class="story">${p.story}</div>` : ''}`;
-  const img = el.querySelector('img');
-  img.onerror = () => { img.outerHTML = `<div class="empty">фото ${n + 1}</div>`; };
-  el.onclick = () => {
-    const i = el.querySelector('img'); if (!i) return;
-    document.getElementById('lbImg').src = i.src;
-    document.getElementById('lbCap').innerHTML =
-      (p.title ? `<b>${p.title}</b><br>` : '') + (p.story || '');
-    lb.classList.add('open');
-  };
-  galleryBox.appendChild(el);
+stops.forEach((s,i)=>{
+  const icon = L.divIcon({className:'num-marker',html:i+1,iconSize:[30,30],iconAnchor:[15,15]});
+  L.marker([s.lat,s.lng],{icon}).addTo(map)
+   .bindPopup(`<b>${i+1}. ${s.title}</b><br>${s.place}<br><a href="#${s.id}">Читать описание ↓</a>`);
 });
-lb.onclick = () => lb.classList.remove('open');
+map.fitBounds(pts,{padding:[30,30]});
+} else { document.getElementById('map').innerHTML='<p style="padding:20px">Карта не загрузилась — проверьте подключение к интернету.</p>'; }
 
-const snapsBox = document.getElementById('snapsBox');
-SNAPS.forEach((src, n) => {
-  const el = document.createElement('div');
-  el.className = 'snap';
-  el.innerHTML = `<img src="${src}" alt="" loading="lazy">`;
-  const img = el.querySelector('img');
-  img.onerror = () => el.remove();
-  el.onclick = () => {
-    document.getElementById('lbImg').src = img.src;
-    document.getElementById('lbCap').innerHTML = '';
-    lb.classList.add('open');
-  };
-  snapsBox.appendChild(el);
-});
+/* ===== ВКЛАДКИ ===== */
+document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById(t.dataset.tab).classList.add('active');
+}));
 
-/* ---------------- ENVELOPE ---------------- */
-document.getElementById('envelope').onclick = () => {
-  document.getElementById('envWrap').style.display = 'none';
-  document.getElementById('letter').style.display = 'block';
-  burst(200);
-};
+/* ===== КАРТОЧКИ «ЗНАЕТЕ ЛИ ВЫ» ===== */
+document.querySelectorAll('.card button').forEach(b=>b.addEventListener('click',()=>{
+  const c=b.parentElement; c.classList.toggle('open');
+  b.textContent=c.classList.contains('open')?'Скрыть':'Ответ';
+}));
 
-/* ---------------- CONFETTI ---------------- */
-const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
-let parts = [];
-function size() { cv.width = innerWidth; cv.height = innerHeight; }
-size(); addEventListener('resize', size);
-const COLORS = ['#f2c4c4', '#c9707a', '#c8a15a', '#a9cfe0', '#23395b', '#fde9e4'];
-function burst(n) {
-  for (let i = 0; i < n; i++) parts.push({
-    x: innerWidth / 2 + (Math.random() - .5) * 200, y: innerHeight / 3,
-    vx: (Math.random() - .5) * 14, vy: Math.random() * -12 - 4,
-    s: Math.random() * 7 + 4, r: Math.random() * 6, vr: (Math.random() - .5) * .3,
-    c: COLORS[Math.floor(Math.random() * COLORS.length)], life: 0
-  });
-  if (parts.length === n) loop();
-}
-function loop() {
-  cx.clearRect(0, 0, cv.width, cv.height);
-  parts.forEach(p => {
-    p.vy += .35; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.vx *= .99; p.life++;
-    cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.fillStyle = p.c;
-    cx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); cx.restore();
-  });
-  parts = parts.filter(p => p.y < cv.height + 20 && p.life < 300);
-  if (parts.length) requestAnimationFrame(loop); else cx.clearRect(0, 0, cv.width, cv.height);
-}
-window.addEventListener('load', () => setTimeout(() => burst(120), 400));
+/* закрывать мобильное меню по клику */
+document.querySelectorAll('.menu a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.menu').classList.remove('open')));
 </script>
 </body>
+</html>
