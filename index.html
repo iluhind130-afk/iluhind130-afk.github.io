@@ -4,212 +4,317 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Янтарная нить — маршрут по Калининградской области</title>
-<meta name="description" content="Интерактивный путеводитель и туристический маршрут по Калининградской области: 13 остановок от Кёнигсберга до Куршской косы.">
+<meta name="description" content="Интерактивный путеводитель и туристический маршрут по Калининградской области: 11 остановок от Кёнигсберга до Куршской косы и Немана.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
   :root{
-    --sea:#0f2a3a;
-    --sea-2:#173b50;
-    --sand:#f6efe3;
-    --sand-2:#ece2cf;
-    --ink:#1d2a33;
-    --muted:#5d6b74;
-    --amber:#d98a1c;
-    --amber-2:#f2b544;
-    --line:#d9cdb6;
-    --radius:14px;
+    --night:#0b1d28;
+    --night-2:#122a38;
+    --night-3:#1b3a4c;
+    --paper:#f4ede1;
+    --paper-2:#e9dfcd;
+    --ink:#16232c;
+    --muted:#6a747a;
+    --amber:#e0952a;
+    --amber-hi:#f6c26b;
+    --amber-lo:#b8701a;
+    --line:rgba(22,35,44,.14);
+    --line-dark:rgba(244,237,225,.14);
+    --serif:"Cormorant Garamond",Georgia,serif;
+    --sans:"Manrope",system-ui,sans-serif;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
-  body{font-family:"Manrope",system-ui,sans-serif;color:var(--ink);background:var(--sand);line-height:1.65;font-size:17px}
+  body{font-family:var(--sans);color:var(--ink);background:var(--paper);line-height:1.7;font-size:17px;-webkit-font-smoothing:antialiased;overflow-x:hidden}
   img{max-width:100%;display:block}
-  a{color:var(--amber)}
-  h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.15}
-  .wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+  a{color:inherit}
+  ::selection{background:var(--amber);color:#fff}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+  .serif{font-family:var(--serif)}
+  em.am{font-style:italic;color:var(--amber);font-family:var(--serif)}
+
+  /* зерно поверх всего — «бумажная» фактура */
+  body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* ---------- фото / заглушки ---------- */
+  .ph{position:relative;background:var(--paper-2);overflow:hidden}
+  .ph img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  .ph.noimg img{display:none}
+  .ph.noimg::after{content:"сюда фото: " attr(data-file);position:absolute;inset:14px;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:13px;letter-spacing:.04em;color:var(--muted);border:1px dashed rgba(0,0,0,.25)}
 
   /* ---------- навигация ---------- */
-  nav{position:sticky;top:0;z-index:1000;background:rgba(15,42,58,.94);backdrop-filter:blur(6px)}
-  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
-  .logo{font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:700;color:var(--sand);text-decoration:none;white-space:nowrap}
-  .logo span{color:var(--amber-2)}
-  .menu{display:flex;gap:22px;list-style:none}
-  .menu a{color:#cfdbe2;text-decoration:none;font-size:15px;font-weight:500}
-  .menu a:hover{color:var(--amber-2)}
-  .burger{display:none;background:none;border:0;color:var(--sand);font-size:28px;cursor:pointer}
+  nav{position:fixed;top:0;left:0;right:0;z-index:1000;transition:background .4s,backdrop-filter .4s,border-color .4s;border-bottom:1px solid transparent}
+  nav.solid{background:rgba(11,29,40,.86);backdrop-filter:blur(12px);border-color:var(--line-dark)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .logo{font-family:var(--serif);font-size:26px;font-weight:600;color:var(--paper);text-decoration:none;letter-spacing:.01em}
+  .logo i{color:var(--amber-hi)}
+  .menu{display:flex;gap:34px;list-style:none}
+  .menu a{color:rgba(244,237,225,.78);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;position:relative}
+  .menu a::after{content:"";position:absolute;left:0;bottom:-6px;height:1px;width:0;background:var(--amber-hi);transition:width .3s}
+  .menu a:hover{color:#fff}.menu a:hover::after{width:100%}
+  .burger{display:none;background:none;border:0;color:var(--paper);font-size:26px;cursor:pointer}
 
-  /* ---------- фото-заглушки ---------- */
-  .ph{position:relative;background:var(--sand-2);overflow:hidden;border-radius:var(--radius)}
-  .ph img{width:100%;height:100%;object-fit:cover}
-  .ph.noimg img{display:none}
-  .ph.noimg::after{content:"📷 сюда фото: " attr(data-file);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:14px;color:var(--muted);border:2px dashed var(--line);border-radius:var(--radius)}
-  .cap{font-size:13px;color:var(--muted);margin-top:8px;font-style:italic}
+  /* ---------- HERO ---------- */
+  .hero{position:relative;height:100vh;min-height:640px;color:var(--paper);background:var(--night);overflow:hidden}
+  .hero .ph{position:absolute;inset:0;background:var(--night)}
+  .hero .ph img{transform:scale(1.08);animation:heroZoom 14s ease-out forwards}
+  @keyframes heroZoom{to{transform:scale(1)}}
+  .hero .ph.noimg::after{color:rgba(244,237,225,.4);border-color:rgba(244,237,225,.2);align-items:flex-start;padding-top:110px}
+  .hero::before{content:"";position:absolute;inset:0;z-index:1;background:
+     radial-gradient(ellipse at 20% 100%,rgba(224,149,42,.28),transparent 55%),
+     linear-gradient(180deg,rgba(11,29,40,.55) 0%,rgba(11,29,40,.1) 35%,rgba(11,29,40,.92) 100%)}
+  .hero-inner{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:56px}
+  .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--amber-hi);font-weight:600;display:flex;align-items:center;gap:14px}
+  .eyebrow::before{content:"";width:40px;height:1px;background:var(--amber-hi)}
+  .hero h1{font-family:var(--serif);font-weight:500;font-size:clamp(64px,13vw,190px);line-height:.88;letter-spacing:-.02em;margin:22px 0 28px}
+  .hero h1 i{color:var(--amber-hi);font-weight:500}
+  .hero-bottom{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end;border-top:1px solid var(--line-dark);padding-top:28px}
+  .hero-bottom p{font-size:clamp(16px,1.6vw,19px);font-weight:300;color:rgba(244,237,225,.88);max-width:560px}
+  .hero-stats{display:flex;justify-content:flex-end;gap:44px}
+  .hero-stats div{text-align:right}
+  .hero-stats b{display:block;font-family:var(--serif);font-size:48px;font-weight:500;line-height:1;color:#fff}
+  .hero-stats span{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:rgba(244,237,225,.6)}
+  .coords{position:absolute;right:28px;top:50%;transform:translateY(-50%) rotate(90deg);transform-origin:right center;z-index:2;font-size:11px;letter-spacing:.3em;color:rgba(244,237,225,.5)}
 
-  /* ---------- шапка ---------- */
-  header.hero{position:relative;min-height:88vh;display:flex;align-items:flex-end;color:#fff;background:var(--sea)}
-  .hero .bg{position:absolute;inset:0;border-radius:0}
-  .hero .bg.noimg::after{color:#9fb3bf;border-color:#2c5168;align-items:flex-start;padding-top:90px;z-index:2}
-  .hero::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,42,58,.15) 0%,rgba(15,42,58,.85) 75%);z-index:1}
-  .hero .wrap{position:relative;z-index:2;padding-bottom:70px;padding-top:120px}
-  .kicker{text-transform:uppercase;letter-spacing:.18em;font-size:13px;color:var(--amber-2);font-weight:600}
-  .hero h1{font-size:clamp(48px,9vw,104px);margin:10px 0 14px}
-  .hero p.lead{max-width:640px;font-size:clamp(17px,2.2vw,20px);color:#e4ecf0}
-  .btn{display:inline-block;margin-top:26px;padding:14px 26px;background:var(--amber);color:#fff;text-decoration:none;border-radius:40px;font-weight:600}
-  .btn:hover{background:#c27612}
+  /* бегущая строка */
+  .marquee{background:var(--amber);color:var(--night);overflow:hidden;white-space:nowrap;padding:16px 0}
+  .marquee-track{display:inline-flex;animation:mq 40s linear infinite}
+  .marquee span{font-family:var(--serif);font-style:italic;font-size:26px;font-weight:600;padding:0 26px}
+  .marquee span::after{content:"✦";font-style:normal;font-size:14px;margin-left:52px;opacity:.6}
+  @keyframes mq{to{transform:translateX(-50%)}}
 
-  /* ---------- секции ---------- */
-  section{padding:90px 0}
-  .sec-title{font-size:clamp(36px,5vw,54px);margin-bottom:14px}
-  .sec-lead{max-width:720px;color:var(--muted);margin-bottom:44px}
+  /* ---------- общие секции ---------- */
+  section{padding:130px 0}
+  .sec-head{display:grid;grid-template-columns:180px 1fr;gap:30px;margin-bottom:70px}
+  .sec-no{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--amber-lo);font-weight:600;padding-top:18px}
+  .sec-title{font-family:var(--serif);font-weight:500;font-size:clamp(44px,6.5vw,92px);line-height:.95;letter-spacing:-.015em}
+  .sec-lead{grid-column:2;max-width:640px;color:var(--muted);font-size:18px;margin-top:22px;font-weight:400}
 
-  /* быстрые факты */
-  .facts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:56px}
-  .fact{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px}
-  .fact b{display:block;font-family:"Cormorant Garamond",serif;font-size:38px;color:var(--sea);line-height:1}
-  .fact span{font-size:14px;color:var(--muted)}
+  /* появление при прокрутке */
+  .reveal{opacity:0;transform:translateY(40px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+  .reveal.in{opacity:1;transform:none}
 
-  /* вкладки о регионе */
-  .tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:26px}
-  .tab{border:1px solid var(--line);background:#fff;padding:9px 18px;border-radius:30px;cursor:pointer;font:600 15px "Manrope",sans-serif;color:var(--ink)}
-  .tab.active{background:var(--sea);color:#fff;border-color:var(--sea)}
-  .panel{display:none;grid-template-columns:1.1fr .9fr;gap:40px;align-items:start}
-  .panel.active{display:grid}
-  .panel h3{font-size:32px;margin-bottom:12px}
-  .panel p{margin-bottom:14px}
-  .panel ul{padding-left:20px;margin-bottom:14px}
-  .panel li{margin-bottom:6px}
-  .panel .ph{aspect-ratio:4/3}
+  /* ---------- РЕГИОН ---------- */
+  .facts{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-bottom:100px}
+  .fact{padding:36px 28px 32px 0}
+  .fact+.fact{padding-left:28px;border-left:1px solid var(--line)}
+  .fact b{display:block;font-family:var(--serif);font-weight:500;font-size:clamp(44px,5vw,68px);line-height:1;color:var(--night);margin-bottom:12px}
+  .fact b small{font-size:.45em;color:var(--amber-lo)}
+  .fact span{font-size:14px;color:var(--muted);line-height:1.5;display:block}
 
-  /* выдающиеся жители */
-  .people{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .person{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px}
-  .person h4{font-family:"Cormorant Garamond",serif;font-size:24px;margin-bottom:2px}
-  .person .yrs{font-size:13px;color:var(--amber);font-weight:600;margin-bottom:8px}
-  .person p{font-size:15px;margin:0}
+  .tabs{display:flex;flex-wrap:wrap;gap:6px 34px;margin-bottom:50px;border-bottom:1px solid var(--line)}
+  .tab{background:none;border:0;padding:0 0 16px;cursor:pointer;font:500 13px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);position:relative}
+  .tab::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--amber);transform:scaleX(0);transition:transform .35s}
+  .tab.active{color:var(--ink)}.tab.active::after{transform:scaleX(1)}
+  .panel{display:none;grid-template-columns:1fr 1fr;gap:70px;align-items:start}
+  .panel.active{display:grid;animation:fade .6s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  .panel h3{font-family:var(--serif);font-weight:500;font-size:44px;line-height:1.05;margin-bottom:22px}
+  .panel p{margin-bottom:16px}
+  .panel ul{list-style:none;margin-bottom:16px}
+  .panel li{padding:12px 0;border-bottom:1px solid var(--line)}
+  .panel li b{color:var(--amber-lo);font-weight:600}
+  .panel .ph{aspect-ratio:4/5}
+  .cap{font-size:12px;letter-spacing:.08em;color:var(--muted);margin-top:12px;text-transform:uppercase}
 
-  /* ---------- маршрут ---------- */
-  #route{background:var(--sea);color:#e4ecf0}
-  #route .sec-title{color:#fff}
-  #route .sec-lead{color:#a9bcc7}
-  .route-meta{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:28px}
-  .route-meta div{background:var(--sea-2);border-radius:30px;padding:8px 16px;font-size:14px}
-  .route-meta b{color:var(--amber-2)}
-  #map{height:560px;border-radius:var(--radius);border:1px solid #2c5168}
-  .num-marker{background:var(--amber);color:#fff;border:2px solid #fff;border-radius:50%;width:30px!important;height:30px!important;display:flex!important;align-items:center;justify-content:center;font:700 14px "Manrope",sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.35)}
-  .leaflet-popup-content{font-family:"Manrope",sans-serif;font-size:14px}
-  .leaflet-popup-content b{font-size:15px}
-  .leaflet-popup-content a{color:var(--amber);font-weight:600}
+  .people-title{font-family:var(--serif);font-weight:500;font-size:48px;margin:120px 0 30px}
+  .people{border-top:1px solid var(--line)}
+  .person{display:grid;grid-template-columns:70px 1.1fr 140px 2fr;gap:24px;align-items:baseline;padding:26px 0;border-bottom:1px solid var(--line);transition:padding .35s,background .35s}
+  .person:hover{background:rgba(224,149,42,.07);padding-left:16px}
+  .person .n{font-family:var(--serif);font-style:italic;color:var(--amber-lo);font-size:22px}
+  .person h4{font-family:var(--serif);font-weight:600;font-size:30px;line-height:1.1}
+  .person .yrs{font-size:13px;letter-spacing:.1em;color:var(--muted)}
+  .person p{font-size:15px;color:#3b474e}
 
-  /* ---------- остановки ---------- */
-  #stops{padding-top:70px}
-  .stop{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:56px 0;border-bottom:1px solid var(--line);scroll-margin-top:70px}
-  .stop:nth-child(even) .ph-col{order:2}
-  .stop .ph{aspect-ratio:4/3}
-  .stop-num{font-family:"Cormorant Garamond",serif;font-size:72px;color:var(--amber);line-height:1;font-weight:700}
-  .stop .place{text-transform:uppercase;letter-spacing:.12em;font-size:12px;color:var(--muted);font-weight:600;margin:6px 0 4px}
-  .stop h3{font-size:38px;margin-bottom:14px}
-  .stop p{margin-bottom:12px}
-  .why{background:#fff;border-left:4px solid var(--amber);padding:14px 18px;border-radius:0 10px 10px 0;font-size:15px;margin-top:14px}
-  .why b{color:var(--sea)}
-  .next{margin-top:16px;font-size:14px;color:var(--muted)}
-  .next::before{content:"→ ";color:var(--amber);font-weight:700}
+  /* ---------- МАРШРУТ (sticky-карта) ---------- */
+  #route{background:var(--night);color:var(--paper);padding-bottom:0}
+  #route .sec-title{color:var(--paper)}
+  #route .sec-lead{color:rgba(244,237,225,.65)}
+  #route .sec-no{color:var(--amber-hi)}
+  .route-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--line-dark)}
+  .map-col{position:relative}
+  .map-sticky{position:sticky;top:72px;height:calc(100vh - 72px);padding:28px 28px 28px 0}
+  #map{height:100%;width:100%;background:#d8d4c8}
+  .map-label{position:absolute;left:18px;bottom:46px;z-index:500;background:var(--night);color:var(--paper);padding:14px 18px;max-width:80%;border-left:3px solid var(--amber)}
+  .map-label small{display:block;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--amber-hi)}
+  .map-label span{font-family:var(--serif);font-size:22px}
+  .num-marker{background:var(--night);color:var(--paper);border:2px solid var(--amber);border-radius:50%;display:flex!important;align-items:center;justify-content:center;font:700 13px var(--sans);transition:all .3s;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+  .num-marker.active{background:var(--amber);color:var(--night);transform:scale(1.35);z-index:1000!important}
+  .leaflet-popup-content-wrapper{border-radius:0;font-family:var(--sans)}
+  .leaflet-container a.leaflet-popup-close-button{color:var(--ink)}
+  .leaflet-control-attribution{font-size:10px}
 
-  /* ---------- знаете ли вы ---------- */
-  #didyouknow{background:var(--sand-2)}
-  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-  .card{background:#fff;border-radius:var(--radius);padding:24px;border:1px solid var(--line)}
-  .card .q{font-weight:700;margin-bottom:10px}
-  .card .a{display:none;color:var(--muted);font-size:15px}
-  .card.open .a{display:block}
-  .card button{margin-top:12px;background:none;border:1px solid var(--amber);color:var(--amber);padding:6px 14px;border-radius:20px;cursor:pointer;font:600 13px "Manrope",sans-serif}
+  .stops-col{padding:28px 0 60px 48px;border-left:1px solid var(--line-dark)}
+  .stop{padding:60px 0 70px;border-bottom:1px solid var(--line-dark);scroll-margin-top:90px;opacity:.38;transition:opacity .6s}
+  .stop.active{opacity:1}
+  .stop .ph{aspect-ratio:3/2;background:var(--night-2);margin-bottom:30px}
+  .stop .ph.noimg::after{color:rgba(244,237,225,.4);border-color:rgba(244,237,225,.2)}
+  .stop:hover .ph img{transform:scale(1.04)}
+  .stop-top{display:flex;align-items:baseline;gap:18px;margin-bottom:6px}
+  .stop-num{font-family:var(--serif);font-style:italic;font-size:64px;line-height:1;color:var(--amber-hi);font-weight:500}
+  .place{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:rgba(244,237,225,.55)}
+  .stop h3{font-family:var(--serif);font-weight:500;font-size:clamp(34px,3.4vw,46px);line-height:1.05;margin-bottom:20px;color:#fff}
+  .stop p{margin-bottom:14px;color:rgba(244,237,225,.82);font-weight:300}
+  .why{margin-top:24px;padding:20px 22px;background:var(--night-2);border-left:2px solid var(--amber);font-size:15px;color:rgba(244,237,225,.9)}
+  .why b{display:block;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--amber-hi);margin-bottom:6px;font-weight:600}
+  .next{margin-top:22px;font-size:14px;color:rgba(244,237,225,.55);display:flex;gap:12px;align-items:center}
+  .next::before{content:"";width:28px;height:1px;background:var(--amber);flex:none}
 
-  /* ---------- источники / подвал ---------- */
-  .sources{columns:2;column-gap:40px;font-size:15px}
-  .sources li{margin-bottom:8px;break-inside:avoid}
-  footer{background:var(--sea);color:#a9bcc7;padding:40px 0;font-size:14px}
-  footer b{color:#fff}
+  /* ---------- ЗНАЕТЕ ЛИ ВЫ (карточки-перевёртыши) ---------- */
+  .flip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .flip{perspective:1200px;height:270px;cursor:pointer}
+  .flip-in{position:relative;width:100%;height:100%;transition:transform .8s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+  .flip.open .flip-in{transform:rotateY(180deg)}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:30px;display:flex;flex-direction:column;justify-content:space-between}
+  .front{background:#fff;border:1px solid var(--line)}
+  .front .q{font-family:var(--serif);font-size:27px;line-height:1.15;font-weight:500}
+  .front .hint{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--amber-lo)}
+  .back{background:var(--night);color:var(--paper);transform:rotateY(180deg)}
+  .back .a{font-size:16px;font-weight:300;line-height:1.6}
+  .back .hint{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--amber-hi)}
+  .flip .qn{font-family:var(--serif);font-style:italic;color:var(--amber-lo);font-size:20px;margin-bottom:10px}
+
+  /* ---------- АВТОРЫ / ИСТОЧНИКИ ---------- */
+  #authors{background:var(--paper-2)}
+  .authors{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line)}
+  .author{padding:40px 28px 40px 0}
+  .author+.author{padding-left:28px;border-left:1px solid var(--line)}
+  .author .an{font-family:var(--serif);font-style:italic;color:var(--amber-lo);font-size:20px}
+  .author h4{font-family:var(--serif);font-weight:500;font-size:clamp(34px,3.6vw,50px);line-height:1;margin-top:14px}
+  .sources{margin-top:110px;display:grid;grid-template-columns:180px 1fr;gap:30px}
+  .sources ul{list-style:none;columns:2;column-gap:40px}
+  .sources li{break-inside:avoid;padding:10px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .sources a{text-decoration:none;display:flex;justify-content:space-between;gap:10px}
+  .sources a::after{content:"↗";color:var(--amber-lo)}
+  .sources a:hover{color:var(--amber-lo)}
+
+  footer{background:var(--night);color:rgba(244,237,225,.6);padding:60px 0 40px;font-size:14px}
+  footer .big{font-family:var(--serif);font-size:clamp(54px,10vw,150px);line-height:.9;color:var(--paper);font-weight:500;letter-spacing:-.02em;margin-bottom:40px}
+  footer .big i{color:var(--amber-hi)}
+  footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line-dark);padding-top:24px}
 
   /* ---------- адаптив ---------- */
-  @media (max-width:900px){
-    .facts{grid-template-columns:repeat(2,1fr)}
-    .panel.active,.stop{grid-template-columns:1fr;gap:24px}
-    .stop:nth-child(even) .ph-col{order:0}
-    .people,.cards{grid-template-columns:1fr 1fr}
-    .sources{columns:1}
-    #map{height:440px}
+  @media (max-width:980px){
+    .sec-head,.sources{grid-template-columns:1fr;gap:10px}
+    .sec-lead{grid-column:1}
+    .facts{grid-template-columns:1fr 1fr}
+    .fact:nth-child(3){padding-left:0;border-left:0}
+    .fact:nth-child(n+3){border-top:1px solid var(--line)}
+    .panel.active{grid-template-columns:1fr;gap:36px}
+    .panel .ph{aspect-ratio:4/3}
+    .person{grid-template-columns:50px 1fr;gap:6px 16px}
+    .person p,.person .yrs{grid-column:2}
+    .route-grid{grid-template-columns:1fr}
+    .map-sticky{position:relative;top:0;height:55vh;padding:0;margin-bottom:10px}
+    .map-label{bottom:16px;left:12px}
+    .stops-col{padding:0;border-left:0}
+    .stop{opacity:1}
+    .flip-grid{grid-template-columns:1fr 1fr}
+    .hero-bottom{grid-template-columns:1fr}
+    .hero-stats{justify-content:flex-start}
+    .hero-stats div{text-align:left}
+    .coords{display:none}
   }
   @media (max-width:700px){
-    .menu{display:none;position:absolute;top:60px;left:0;right:0;flex-direction:column;background:var(--sea);padding:16px 20px;gap:14px}
+    body{font-size:16px}
+    .wrap{padding:0 18px}
+    .menu{display:none;position:absolute;top:72px;left:0;right:0;flex-direction:column;background:var(--night);padding:24px 18px;gap:20px}
     .menu.open{display:flex}
     .burger{display:block}
-    .people,.cards{grid-template-columns:1fr}
-    section{padding:64px 0}
-    .stop h3{font-size:32px}
+    section{padding:90px 0}
+    .facts,.authors{grid-template-columns:1fr}
+    .fact,.fact+.fact,.author,.author+.author{padding:26px 0;border-left:0}
+    .fact+.fact,.author+.author{border-top:1px solid var(--line)}
+    .flip-grid{grid-template-columns:1fr}
+    .sources ul{columns:1}
+    .hero-stats{gap:28px}
+    .hero-stats b{font-size:38px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+    .reveal{opacity:1;transform:none}
   }
 </style>
 </head>
 <body>
 
-<nav>
+<nav id="nav">
   <div class="wrap">
-    <a class="logo" href="#top">Янтарная <span>нить</span></a>
+    <a class="logo" href="#top">Янтарная <i>нить</i></a>
     <button class="burger" aria-label="Меню" onclick="document.querySelector('.menu').classList.toggle('open')">☰</button>
     <ul class="menu">
-      <li><a href="#region">О регионе</a></li>
-      <li><a href="#route">Карта маршрута</a></li>
-      <li><a href="#stops">Остановки</a></li>
+      <li><a href="#region">Регион</a></li>
+      <li><a href="#route">Маршрут</a></li>
       <li><a href="#didyouknow">Знаете ли вы?</a></li>
-      <li><a href="#sources">Источники</a></li>
+      <li><a href="#authors">Авторы</a></li>
     </ul>
   </div>
 </nav>
 
-<!-- ================= ШАПКА ================= -->
+<!-- ================= HERO ================= -->
 <header class="hero" id="top">
-  <div class="ph bg" data-file="hero.jpg">
+  <div class="ph" data-file="hero.jpg">
     <img src="hero.jpg" alt="Балтийское побережье Калининградской области" onerror="this.parentElement.classList.add('noimg')">
   </div>
-  <div class="wrap">
-    <div class="kicker">Путеводитель · Калининградская область</div>
-    <h1>Янтарная нить</h1>
-    <p class="lead">13 остановок на западном краю России: от готического собора на острове Канта через янтарные берега Балтики к дюнам Куршской косы и мосту в Советске, где в 1807 году решалась судьба Европы.</p>
-    <a class="btn" href="#route">Смотреть маршрут</a>
+  <div class="coords">54°42′ с. ш. · 20°30′ в. д.</div>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">Путеводитель по Калининградской области</div>
+    <h1>Янтарная<br><i>нить</i></h1>
+    <div class="hero-bottom">
+      <p>Маршрут по западному краю России: от готического собора на острове Канта через балтийские курорты к дюнам Куршской косы и мосту в Советске, где в 1807 году решалась судьба Европы.</p>
+      <div class="hero-stats">
+        <div><b>11</b><span>остановок</span></div>
+        <div><b>≈400</b><span>км пути</span></div>
+        <div><b>3</b><span>дня</span></div>
+      </div>
+    </div>
   </div>
 </header>
 
-<!-- ================= О РЕГИОНЕ ================= -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track" id="mq"></div>
+</div>
+
+<!-- ================= РЕГИОН ================= -->
 <section id="region">
   <div class="wrap">
-    <h2 class="sec-title">Самый западный регион России</h2>
-    <p class="sec-lead">Калининградская область — эксклав: она отделена от остальной России территориями Литвы и Польши и выходит к Балтийскому морю. За 800 лет здесь сменились пруссы, Тевтонский орден, Пруссия и Германия, а с 1946 года это российская земля, на которой история нескольких эпох видна буквально на каждой улице.</p>
-
-    <div class="facts">
-      <div class="fact"><b>1946</b><span>год образования области (сначала Кёнигсбергская, с 4 июля — Калининградская)</span></div>
-      <div class="fact"><b>≈15,1 тыс. км²</b><span>площадь — один из самых маленьких регионов страны</span></div>
-      <div class="fact"><b>≈1 млн</b><span>жителей, около половины из них живут в Калининграде</span></div>
-      <div class="fact"><b>≈90%</b><span>разведанных мировых запасов янтаря</span></div>
+    <div class="sec-head reveal">
+      <div class="sec-no">01 — Регион</div>
+      <div>
+        <h2 class="sec-title">Самый западный<br>регион <em class="am">России</em></h2>
+        <p class="sec-lead">Калининградская область — эксклав: она отделена от остальной России территориями Литвы и Польши и выходит к Балтийскому морю. За восемь веков здесь сменились пруссы, Тевтонский орден, Пруссия и Германия, а с 1946 года это российская земля, где история нескольких эпох видна буквально на каждой улице.</p>
+      </div>
     </div>
 
-    <div class="tabs" role="tablist">
+    <div class="facts reveal">
+      <div class="fact"><b>1946</b><span>год образования области: сначала Кёнигсбергская, с 4 июля — Калининградская</span></div>
+      <div class="fact"><b>15,1<small> тыс. км²</small></b><span>площадь — один из самых маленьких регионов страны</span></div>
+      <div class="fact"><b>≈1<small> млн</small></b><span>жителей, около половины живут в Калининграде</span></div>
+      <div class="fact"><b>90<small>%</small></b><span>разведанных мировых запасов янтаря</span></div>
+    </div>
+
+    <div class="tabs reveal" role="tablist">
       <button class="tab active" data-tab="geo">География</button>
       <button class="tab" data-tab="hist">История</button>
       <button class="tab" data-tab="eco">Экономика</button>
       <button class="tab" data-tab="pop">Население и религия</button>
-      <button class="tab" data-tab="cult">Культура и традиции</button>
+      <button class="tab" data-tab="cult">Культура</button>
     </div>
 
     <div class="panel active" id="geo">
       <div>
         <h3>География и природа</h3>
         <p>Область граничит с Литвой на севере и востоке и с Польшей на юге, а с запада её омывает Балтийское море. Большая часть территории — равнина, местами ниже уровня моря: польдерные земли в низовьях Немана осушали ещё со времён Тевтонского ордена.</p>
-        <p>Главные природные богатства побережья — две песчаные косы. <b>Куршская коса</b> длиной 98 км отделяет Куршский залив от моря, её российская часть — национальный парк и объект Всемирного наследия ЮНЕСКО (с 2000 года). <b>Балтийская коса</b> отделяет Калининградский (Вислинский) залив; на ней находится самая западная точка России.</p>
+        <p>Главные природные богатства побережья — две песчаные косы. <b>Куршская коса</b> длиной 98 км отделяет Куршский залив от моря; её российская часть — национальный парк и объект Всемирного наследия ЮНЕСКО (с 2000 года). <b>Балтийская коса</b> отделяет Калининградский (Вислинский) залив; на ней находится самая западная точка России.</p>
         <p>Климат переходный от морского к умеренно-континентальному: мягкая зима, нежаркое лето, много осадков.</p>
       </div>
       <div>
         <div class="ph" data-file="region-priroda.jpg"><img src="region-priroda.jpg" alt="Природа Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
-        <p class="cap">Подпишите, где сделано фото</p>
+        <p class="cap">Природа побережья</p>
       </div>
     </div>
 
@@ -221,40 +326,40 @@
           <li><b>1255</b> — рыцари Тевтонского ордена основывают замок Кёнигсберг («Королевская гора»).</li>
           <li><b>1525</b> — орденское государство становится светским герцогством Пруссия; в 1544 году основан университет Альбертина.</li>
           <li><b>1701</b> — в Кёнигсберге коронуется первый прусский король Фридрих I.</li>
-          <li><b>1758–1762</b> — во время Семилетней войны Восточная Пруссия находится в составе Российской империи; её жители, в том числе Иммануил Кант, присягают императрице Елизавете Петровне.</li>
+          <li><b>1758–1762</b> — в годы Семилетней войны Восточная Пруссия входит в состав Российской империи; её жители, в том числе Иммануил Кант, присягают императрице Елизавете Петровне.</li>
           <li><b>Апрель 1945</b> — штурм Кёнигсберга войсками 3-го Белорусского фронта.</li>
           <li><b>1945–1946</b> — по решению Потсдамской конференции северная часть Восточной Пруссии передана СССР, образована Калининградская область.</li>
         </ul>
       </div>
       <div>
         <div class="ph" data-file="region-istoriya.jpg"><img src="region-istoriya.jpg" alt="Исторический Калининград" onerror="this.parentElement.classList.add('noimg')"></div>
-        <p class="cap">Подпишите, где сделано фото</p>
+        <p class="cap">Исторический Калининград</p>
       </div>
     </div>
 
     <div class="panel" id="eco">
       <div>
         <h3>Экономика и ресурсы</h3>
-        <p>С 1996 года в регионе действует <b>особая экономическая зона</b> — льготный режим, который должен компенсировать удалённость от основной части страны.</p>
+        <p>С 1996 года в регионе действует <b>особая экономическая зона</b> — льготный режим, который помогает компенсировать удалённость от основной части страны.</p>
         <ul>
           <li><b>Янтарь</b> — в посёлке Янтарный работает Калининградский янтарный комбинат, единственное в мире предприятие, добывающее янтарь в промышленном масштабе.</li>
           <li><b>Машиностроение</b> — сборка автомобилей («Автотор»), судостроение (завод «Янтарь» строит корабли для флота).</li>
-          <li><b>Рыболовство и переработка рыбы</b>, морские порты Калининград и Балтийск.</li>
+          <li><b>Рыболовство и порты</b> — рыбопереработка, морские порты Калининград и Балтийск.</li>
           <li><b>Сельское хозяйство</b> на плодородных осушенных землях.</li>
-          <li><b>Туризм</b> — курорты Светлогорск и Зеленоградск, Куршская коса и сам Калининград ежегодно принимают более миллиона туристов.</li>
+          <li><b>Туризм</b> — Светлогорск, Зеленоградск, Куршская коса и сам Калининград ежегодно принимают более миллиона гостей.</li>
         </ul>
       </div>
       <div>
         <div class="ph" data-file="region-yantar.jpg"><img src="region-yantar.jpg" alt="Янтарь" onerror="this.parentElement.classList.add('noimg')"></div>
-        <p class="cap">Например, ваше фото янтаря или изделий из него</p>
+        <p class="cap">Балтийский янтарь</p>
       </div>
     </div>
 
     <div class="panel" id="pop">
       <div>
         <h3>Население и религия</h3>
-        <p>После 1945 года немецкое население было выселено, и область заново заселили переселенцы со всего Советского Союза — из России, Белоруссии, Украины, Поволжья. Поэтому Калининградская область — регион без «коренного» местного говора и очень смешанный по происхождению жителей.</p>
-        <p>Большинство верующих — православные. Главный храм — <b>Храм Христа Спасителя</b> на площади Победы, освящённый в 2006 году. Многие бывшие лютеранские и католические кирхи сегодня отданы Русской православной церкви или служат концертными залами, например бывшая кирха Святого Семейства — сейчас Калининградская филармония. Действуют также католические и лютеранские приходы, синагога, восстановленная в 2018 году на историческом месте.</p>
+        <p>После 1945 года немецкое население было выселено, и область заново заселили переселенцы со всего Советского Союза — из России, Белоруссии, Украины, Поволжья. Поэтому Калининградская область очень смешанная по происхождению жителей и не имеет собственного старого местного говора.</p>
+        <p>Большинство верующих — православные. Главный храм — <b>Храм Христа Спасителя</b> на площади Победы, освящённый в 2006 году. Многие бывшие лютеранские и католические кирхи сегодня переданы Русской православной церкви или служат концертными залами: в бывшей кирхе Святого Семейства работает Калининградская филармония. Действуют также католические и лютеранские приходы и синагога, восстановленная в 2018 году на историческом месте.</p>
       </div>
       <div>
         <div class="ph" data-file="region-hram.jpg"><img src="region-hram.jpg" alt="Храм Христа Спасителя в Калининграде" onerror="this.parentElement.classList.add('noimg')"></div>
@@ -268,25 +373,25 @@
         <p>Узнаваемый облик региона — красный кирпич, черепичные крыши, брусчатка и аллеи старых деревьев вдоль дорог. Здесь сохранилось больше сотни орденских замков, кирх и фортов.</p>
         <ul>
           <li><b>Янтарные промыслы</b> — резьба по янтарю, ювелирные мастерские, музей янтаря.</li>
-          <li><b>Кухня</b> — балтийская рыба (копчёный угорь, салака, корюшка), клопсы — кёнигсбергские мясные тефтели в соусе с каперсами, марципан.</li>
+          <li><b>Кухня</b> — балтийская рыба (копчёный угорь, салака, корюшка), кёнигсбергские клопсы — мясные тефтели в соусе с каперсами, марципан.</li>
           <li><b>Фестивали</b> — джазовый Kaliningrad City Jazz, «Кантовские чтения», праздник корюшки.</li>
-          <li><b>Кант</b> — имя философа носит университет (БФУ им. И. Канта), а остров, где он похоронен, называют островом Канта.</li>
+          <li><b>Кант</b> — его имя носит университет (БФУ им. И. Канта), а остров, где он похоронен, называют островом Канта.</li>
         </ul>
       </div>
       <div>
         <div class="ph" data-file="region-kultura.jpg"><img src="region-kultura.jpg" alt="Культура Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
-        <p class="cap">Подпишите, где сделано фото</p>
+        <p class="cap">Атмосфера края</p>
       </div>
     </div>
 
-    <h3 style="font-size:34px;margin:64px 0 18px">Выдающиеся жители</h3>
-    <div class="people">
-      <div class="person"><h4>Иммануил Кант</h4><div class="yrs">1724–1804</div><p>Философ, основатель немецкой классической философии. Почти всю жизнь прожил в Кёнигсберге, похоронен у Кафедрального собора.</p></div>
-      <div class="person"><h4>Э. Т. А. Гофман</h4><div class="yrs">1776–1822</div><p>Писатель-романтик, автор «Щелкунчика и Мышиного короля». Родился и учился в Кёнигсберге.</p></div>
-      <div class="person"><h4>Давид Гильберт</h4><div class="yrs">1862–1943</div><p>Один из величайших математиков XX века, уроженец Кёнигсберга, выпускник местного университета.</p></div>
-      <div class="person"><h4>Кристионас Донелайтис</h4><div class="yrs">1714–1780</div><p>Основоположник литовской художественной литературы, автор поэмы «Времена года». Служил пастором в Тольминкемисе — ныне посёлок Чистые Пруды, где открыт его музей.</p></div>
-      <div class="person"><h4>Кете Кольвиц</h4><div class="yrs">1867–1945</div><p>Художница и график, родилась в Кёнигсберге. Её работы — о войне, бедности и материнстве.</p></div>
-      <div class="person"><h4>Леонард Эйлер</h4><div class="yrs">связан с городом</div><p>Не жил здесь, но решил задачу о <b>семи мостах Кёнигсберга</b> (1736) — с неё началась теория графов. Мосты стояли вокруг острова Канта.</p></div>
+    <h3 class="people-title reveal">Выдающиеся <em class="am">жители</em></h3>
+    <div class="people reveal">
+      <div class="person"><span class="n">i.</span><h4>Иммануил Кант</h4><span class="yrs">1724–1804</span><p>Философ, основатель немецкой классической философии. Почти всю жизнь прожил в Кёнигсберге, похоронен у Кафедрального собора.</p></div>
+      <div class="person"><span class="n">ii.</span><h4>Э. Т. А. Гофман</h4><span class="yrs">1776–1822</span><p>Писатель-романтик, автор сказки «Щелкунчик и Мышиный король». Родился и учился в Кёнигсберге.</p></div>
+      <div class="person"><span class="n">iii.</span><h4>Давид Гильберт</h4><span class="yrs">1862–1943</span><p>Один из величайших математиков XX века, уроженец Кёнигсберга и выпускник местного университета.</p></div>
+      <div class="person"><span class="n">iv.</span><h4>Кристионас Донелайтис</h4><span class="yrs">1714–1780</span><p>Основоположник литовской художественной литературы, автор поэмы «Времена года». Служил пастором в Тольминкемисе — ныне посёлок Чистые Пруды, где открыт его музей.</p></div>
+      <div class="person"><span class="n">v.</span><h4>Кете Кольвиц</h4><span class="yrs">1867–1945</span><p>Художница и график, родилась в Кёнигсберге. Её работы — о войне, бедности и материнстве.</p></div>
+      <div class="person"><span class="n">vi.</span><h4>Леонард Эйлер</h4><span class="yrs">задача 1736 г.</span><p>Не жил здесь, но решил задачу о <b>семи мостах Кёнигсберга</b> — с неё началась теория графов. Мосты стояли вокруг острова Канта.</p></div>
     </div>
   </div>
 </section>
@@ -294,76 +399,97 @@
 <!-- ================= МАРШРУТ ================= -->
 <section id="route">
   <div class="wrap">
-    <h2 class="sec-title">Карта маршрута</h2>
-    <p class="sec-lead">Маршрут нанизан на одну «нить»: мы идём от Средневековья к сегодняшнему дню и от города к морю. Сначала — история Кёнигсберга и его превращение в Калининград, затем янтарное побережье, где формировалось богатство края, и в конце — природа Куршской косы и граница на Немане. Нажмите на точку, чтобы перейти к описанию.</p>
-    <div class="route-meta">
-      <div><b>13</b> остановок</div>
-      <div>≈ <b>430 км</b> пути</div>
-      <div><b>3–4</b> дня на машине</div>
-      <div>лучшее время: <b>май — сентябрь</b></div>
+    <div class="sec-head reveal">
+      <div class="sec-no">02 — Маршрут</div>
+      <div>
+        <h2 class="sec-title">Одиннадцать<br>остановок <em class="am">одной нити</em></h2>
+        <p class="sec-lead">Мы идём от Средневековья к сегодняшнему дню и от города к морю. Сначала — история Кёнигсберга и его превращение в Калининград, затем янтарь и балтийские курорты, и в конце — природа Куршской косы и граница на Немане. Листайте — карта следует за вами. Лучшее время для поездки — с мая по сентябрь.</p>
+      </div>
     </div>
-    <div id="map"></div>
   </div>
-</section>
-
-<!-- ================= ОСТАНОВКИ ================= -->
-<section id="stops">
-  <div class="wrap" id="stops-list"></div>
+  <div class="wrap">
+    <div class="route-grid">
+      <div class="map-col">
+        <div class="map-sticky">
+          <div id="map"></div>
+          <div class="map-label"><small id="ml-num">Остановка 01</small><span id="ml-title">Кафедральный собор</span></div>
+        </div>
+      </div>
+      <div class="stops-col" id="stops-list"></div>
+    </div>
+  </div>
 </section>
 
 <!-- ================= ЗНАЕТЕ ЛИ ВЫ ================= -->
 <section id="didyouknow">
   <div class="wrap">
-    <h2 class="sec-title">Знаете ли вы?</h2>
-    <p class="sec-lead">Проверьте себя — нажмите «Ответ».</p>
-    <div class="cards">
-      <div class="card"><div class="q">Почему Куршская коса называется «куршской»?</div><div class="a">По имени балтского племени куршей, жившего на этих берегах в Средние века.</div><button>Ответ</button></div>
-      <div class="card"><div class="q">Сколько лет янтарю, который добывают в Янтарном?</div><div class="a">Около 35–45 миллионов лет. Это окаменевшая смола хвойных деревьев, росших в эпоху эоцена.</div><button>Ответ</button></div>
-      <div class="card"><div class="q">Как называлась область в первые три месяца?</div><div class="a">Кёнигсбергская. 4 июля 1946 года город переименовали в Калининград в честь М. И. Калинина, а вслед за ним и область.</div><button>Ответ</button></div>
-      <div class="card"><div class="q">Можно ли пройти по всем семи мостам Кёнигсберга, побывав на каждом ровно один раз?</div><div class="a">Нет. Эйлер доказал это в 1736 году — и тем самым заложил основы теории графов.</div><button>Ответ</button></div>
-      <div class="card"><div class="q">Где находится самая западная точка России?</div><div class="a">На Балтийской косе, на границе с Польшей, недалеко от Балтийска.</div><button>Ответ</button></div>
-      <div class="card"><div class="q">Что общего у Советска и сыра?</div><div class="a">Советск до 1946 года назывался Тильзитом — отсюда название «тильзитского» сыра, который здесь начали варить в XIX веке.</div><button>Ответ</button></div>
+    <div class="sec-head reveal">
+      <div class="sec-no">03 — Викторина</div>
+      <div>
+        <h2 class="sec-title">Знаете <em class="am">ли вы?</em></h2>
+        <p class="sec-lead">Нажмите на карточку, чтобы перевернуть её и узнать ответ.</p>
+      </div>
     </div>
+    <div class="flip-grid reveal" id="flips"></div>
   </div>
 </section>
 
-<!-- ================= ИСТОЧНИКИ ================= -->
-<section id="sources">
+<!-- ================= АВТОРЫ ================= -->
+<section id="authors">
   <div class="wrap">
-    <h2 class="sec-title">Источники и полезные ссылки</h2>
-    <ul class="sources">
-      <li><a href="https://visit-kaliningrad.ru/" target="_blank" rel="noopener">Туристический портал Калининградской области</a></li>
-      <li><a href="https://whc.unesco.org/ru/list/994" target="_blank" rel="noopener">ЮНЕСКО: Куршская коса</a></li>
-      <li><a href="https://park-kosa.ru/" target="_blank" rel="noopener">Национальный парк «Куршская коса»</a></li>
-      <li><a href="https://world-ocean.ru/" target="_blank" rel="noopener">Музей Мирового океана</a></li>
-      <li><a href="https://ambermuseum.ru/" target="_blank" rel="noopener">Музей янтаря</a></li>
-      <li><a href="https://sobor-kaliningrad.ru/" target="_blank" rel="noopener">Кафедральный собор</a></li>
-      <li><a href="https://kantiana.ru/" target="_blank" rel="noopener">БФУ им. Иммануила Канта</a></li>
-      <li><a href="https://ru.wikipedia.org/wiki/Калининградская_область" target="_blank" rel="noopener">Калининградская область — Википедия</a></li>
-    </ul>
+    <div class="sec-head reveal">
+      <div class="sec-no">04 — Авторы</div>
+      <div>
+        <h2 class="sec-title">Над проектом <em class="am">работали</em></h2>
+        <p class="sec-lead">Все фотографии на сайте — авторские.</p>
+      </div>
+    </div>
+    <div class="authors reveal">
+      <div class="author"><span class="an">01</span><h4>Даниил<br>Илюхин</h4></div>
+      <div class="author"><span class="an">02</span><h4>Юлия<br>Чукавова</h4></div>
+      <div class="author"><span class="an">03</span><h4>Екатерина<br>Соколовская</h4></div>
+    </div>
+
+    <div class="sources reveal" id="sources">
+      <div class="sec-no">Источники</div>
+      <ul>
+        <li><a href="https://visit-kaliningrad.ru/" target="_blank" rel="noopener">Туристический портал Калининградской области</a></li>
+        <li><a href="https://whc.unesco.org/ru/list/994" target="_blank" rel="noopener">ЮНЕСКО: Куршская коса</a></li>
+        <li><a href="https://park-kosa.ru/" target="_blank" rel="noopener">Национальный парк «Куршская коса»</a></li>
+        <li><a href="https://world-ocean.ru/" target="_blank" rel="noopener">Музей Мирового океана</a></li>
+        <li><a href="https://ambermuseum.ru/" target="_blank" rel="noopener">Музей янтаря</a></li>
+        <li><a href="https://sobor-kaliningrad.ru/" target="_blank" rel="noopener">Кафедральный собор</a></li>
+        <li><a href="https://kantiana.ru/" target="_blank" rel="noopener">БФУ им. Иммануила Канта</a></li>
+        <li><a href="https://ru.wikipedia.org/wiki/Калининградская_область" target="_blank" rel="noopener">Калининградская область — Википедия</a></li>
+      </ul>
+    </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p><b>«Янтарная нить»</b> — проект по курсу «Основы российской государственности». Авторы: <b>Имя Фамилия, Имя Фамилия, Имя Фамилия</b>. Фотографии — авторские.</p>
+    <div class="big">Янтарная <i>нить</i></div>
+    <div class="row">
+      <span>Путеводитель по Калининградской области · 2026</span>
+      <span>Д. Илюхин · Ю. Чукавова · Е. Соколовская</span>
+    </div>
   </div>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-/* ===== ДАННЫЕ ОСТАНОВОК =====
-   photo — имя файла в папке  */
+/* ===== ОСТАНОВКИ =====
+   photo — имя файла фото в репозитории */
 const stops = [
   {
     id:"sobor", photo:"01-kafedralnyj-sobor.jpg", lat:54.7066, lng:20.5118,
     title:"Кафедральный собор и могила Канта", place:"Калининград, остров Канта",
     text:[
-      "Точка, с которой начинается история города. Собор строился в 1333–1380 годах на острове Кнайпхоф, одном из трёх средневековых городов, которые в 1724 году объединились в Кёнигсберг. Здесь короновались и были погребены герцоги Пруссии.",
-      "В 1945 году собор сгорел и полвека стоял руинами. Восстановлен в 1990–2000-х годах; сейчас в нём музей и концертный зал с крупнейшим в России органным комплексом. У северо-восточного угла — могила Иммануила Канта, одно из немногих немецких захоронений, которые бережно сохранялись и в советское время."
+      "Точка, с которой начинается история города. Собор строился в 1333–1380 годах на острове Кнайпхоф — одном из трёх средневековых городов, которые в 1724 году объединились в Кёнигсберг. Здесь короновались и были погребены герцоги Пруссии.",
+      "В 1945 году собор сгорел и полвека стоял в руинах. Восстановлен в 1990–2000-х годах; сейчас в нём музей и концертный зал с крупнейшим в России органным комплексом. У северо-восточного угла — могила Иммануила Канта, одно из немногих немецких захоронений, которые бережно сохранялись и в советское время."
     ],
     why:"Символ преемственности: памятник немецкой готики, восстановленный в российском Калининграде, где покоится философ, когда-то бывший подданным Российской империи.",
-    next:"Через бывшие кварталы старого города идём к Королевским воротам — около 2 км."
+    next:"Через бывшие кварталы старого города — к Королевским воротам, около 2 км."
   },
   {
     id:"vorota", photo:"02-korolevskie-vorota.jpg", lat:54.7176, lng:20.5340,
@@ -377,13 +503,13 @@ const stops = [
   },
   {
     id:"amber-museum", photo:"03-muzej-yantarya.jpg", lat:54.7209, lng:20.5222,
-    title:"Музей янтаря в башне Дона", place:"Калининград, площадь Маршала Василевского",
+    title:"Музей янтаря в башне Дона", place:"Калининград, пл. Маршала Василевского",
     text:[
-      "Музей открыт в 1979 году в оборонительной башне Дона, построенной в середине XIX века и названной в честь прусского генерала Фридриха цу Дона. В коллекции — тысячи образцов: от янтаря с застывшими насекомыми и растениями возрастом около 40 млн лет до ювелирных изделий и копий фрагментов Янтарной комнаты.",
-      "Здесь начинается «янтарная» линия маршрута: мы узнаём, что такое янтарь, а через несколько остановок увидим, где его добывают."
+      "Музей открыт в 1979 году в оборонительной башне Дона, построенной в середине XIX века и названной в честь прусского генерала Фридриха цу Дона. В коллекции — тысячи образцов: от янтаря с застывшими насекомыми и растениями возрастом около 40 млн лет до ювелирных изделий и фрагментов воссозданной Янтарной комнаты.",
+      "Почти весь янтарь мира добывают здесь, в Калининградской области — в посёлке Янтарный на побережье, мимо которого пройдёт наш маршрут."
     ],
     why:"Янтарь — главный природный символ региона и его «визитная карточка» для всей России.",
-    next:"Едем к набережной Петра Великого на реке Преголя — около 3 км."
+    next:"К набережной Петра Великого на реке Преголя — около 3 км."
   },
   {
     id:"ocean", photo:"04-muzej-mirovogo-okeana.jpg", lat:54.7063, lng:20.4994,
@@ -393,7 +519,7 @@ const stops = [
       "Музей рассказывает о море как о главной «дороге» Калининградской области: через Балтику идут грузы, здесь базируется флот и работают рыбаки."
     ],
     why:"Показывает морское значение региона для страны: незамерзающие порты и выход России к Балтике.",
-    next:"Выезжаем на северо-западную окраину города к форту № 5 — около 6 км."
+    next:"На северо-западную окраину города, к форту № 5 — около 6 км."
   },
   {
     id:"fort5", photo:"05-fort-5.jpg", lat:54.7343, lng:20.4247,
@@ -403,17 +529,17 @@ const stops = [
       "Сейчас здесь историко-мемориальный комплекс с мемориалом «Штурм Кёнигсберга» и экспозицией военной техники."
     ],
     why:"Место памяти о цене, которой досталась эта земля, и о том, как Кёнигсберг стал Калининградом.",
-    next:"Едем вдоль залива на юго-запад к руинам замка Бальга — около 45 км."
+    next:"Вдоль залива на юго-запад, к руинам замка Бальга — около 45 км."
   },
   {
     id:"balga", photo:"06-zamok-balga.jpg", lat:54.5583, lng:20.2044,
     title:"Замок Бальга", place:"Багратионовский район, пос. Весёлое",
     text:[
       "Руины первого каменного замка Тевтонского ордена на этой земле — его начали строить в 1239 году, на 16 лет раньше Кёнигсберга. Замок стоит на высоком берегу Калининградского залива, с которого видна Балтийская коса.",
-      "Именно отсюда орден вёл завоевание прусских земель; позже замок служил резиденцией комтура. До наших дней дошли фрагменты башни и стен."
+      "Отсюда орден вёл завоевание прусских земель; позже замок служил резиденцией комтура. До наших дней дошли фрагменты башни и стен."
     ],
-    why:"Отправная точка всей немецкой истории региона — до её начала край принадлежал пруссам.",
-    next:"Огибаем залив и едем в Балтийск — около 70 км."
+    why:"Отправная точка всей немецкой истории региона — до неё край принадлежал пруссам.",
+    next:"Огибаем залив — в Балтийск, около 70 км."
   },
   {
     id:"baltiysk", photo:"07-baltijsk.jpg", lat:54.6431, lng:19.8932,
@@ -423,17 +549,7 @@ const stops = [
       "Сегодня Балтийск — главная база Балтийского флота России. На набережной стоят памятник Петру I и конный памятник императрице Елизавете Петровне — в её правление Пиллау уже был частью Российской империи."
     ],
     why:"Стратегическое значение для России: незамерзающая военно-морская база на Балтике.",
-    next:"По побережью на север, в посёлок Янтарный — около 30 км."
-  },
-  {
-    id:"yantarny", photo:"08-yantarnyj.jpg", lat:54.8702, lng:19.9419,
-    title:"Посёлок Янтарный и янтарный карьер", place:"Янтарный городской округ",
-    text:[
-      "Здесь находится Приморское месторождение, где сосредоточено около 90% разведанных мировых запасов янтаря. Калининградский янтарный комбинат ведёт добычу открытым способом; к карьеру есть смотровая площадка.",
-      "Сам посёлок (до 1946 года — Пальмникен) — тихий курорт с одним из лучших пляжей Балтики и парком Беккера, названным в честь промышленника, наладившего здесь добычу янтаря в XIX веке."
-    ],
-    why:"Уникальный для мира ресурс: связь с музеем янтаря из остановки № 3 — там мы видели результат, здесь видим источник.",
-    next:"По морскому берегу в Светлогорск — около 25 км."
+    next:"На север вдоль моря, мимо янтарного посёлка Янтарный, — в Светлогорск, около 55 км."
   },
   {
     id:"svetlogorsk", photo:"09-svetlogorsk.jpg", lat:54.9426, lng:20.1522,
@@ -443,37 +559,27 @@ const stops = [
       "Здесь сохранилась застройка курортных вилл начала XX века, водолечебница с башней в стиле модерн и органный зал. Летом на набережной — один из самых красивых закатов на Балтике."
     ],
     why:"Пример того, как исторический курорт стал частью российской курортной традиции — сюда едут отдыхать со всей страны.",
-    next:"Вдоль моря на восток в Зеленоградск — около 25 км."
+    next:"Вдоль моря на восток — в Зеленоградск, около 25 км."
   },
   {
     id:"zelenogradsk", photo:"10-zelenogradsk.jpg", lat:54.9592, lng:20.4801,
     title:"Зеленоградск — город кошек", place:"Зеленоградский муниципальный округ",
     text:[
       "Бывший Кранц — курорт, где отдыхали жители Кёнигсберга. Сегодня здесь длинный променад, черепичные крыши и десятки скульптур кошек, а в старой водонапорной башне работает музей кошек «Мурариум» — кошки стали символом города.",
-      "Зеленоградск — «ворота» на Куршскую косу, отсюда начинается дорога в национальный парк."
+      "Зеленоградск — «ворота» на Куршскую косу: отсюда начинается дорога в национальный парк."
     ],
     why:"Современная жизнь региона: старый курорт, получивший новый образ и ставший одним из самых популярных мест отдыха.",
-    next:"Въезжаем на Куршскую косу и едем до 37-го километра — около 40 км."
+    next:"Въезжаем на Куршскую косу — до 37-го километра, около 40 км."
   },
   {
     id:"dancing-forest", photo:"11-tancuyushchij-les.jpg", lat:55.1813, lng:20.8628,
     title:"«Танцующий лес»", place:"Куршская коса, 37-й км",
     text:[
       "Сосны в этом лесу закручены в кольца, спирали и петли. Деревья высадили в 1960-х годах на дюне Круглой для укрепления песков, и почему они растут так причудливо, до конца не ясно: среди версий — ветер, неустойчивый песок и гусеница-вредитель, повреждающая молодые побеги.",
-      "Рядом в посёлке Рыбачий находится орнитологическая станция «Фрингилла»: в 1901 году здесь открыли первую в мире станцию кольцевания птиц. Над косой проходит один из главных путей миграции птиц в Европе."
+      "Неподалёку, в посёлке Рыбачий, находится орнитологическая станция «Фрингилла»: в 1901 году здесь открыли первую в мире станцию кольцевания птиц. Над косой проходит один из главных путей миграции птиц в Европе. Когда-то подвижные дюны засыпали здесь целые деревни, и только посадки леса остановили пески."
     ],
     why:"Природное наследие мирового значения: коса — объект ЮНЕСКО, созданный и природой, и трудом людей, укреплявших дюны.",
-    next:"Дальше по косе к высоте Эфа — около 10 км."
-  },
-  {
-    id:"efa", photo:"12-vysota-efa.jpg", lat:55.2667, lng:20.9584,
-    title:"Высота Эфа", place:"Куршская коса, 42-й км",
-    text:[
-      "Одна из самых высоких точек косы — дюна высотой около 60 метров, названная в честь Франца Эфы, который в XIX веке руководил работами по закреплению подвижных песков. По деревянной тропе можно подняться к смотровым площадкам: с одной стороны — Балтийское море, с другой — Куршский залив и «песчаная пустыня».",
-      "Двигаясь, дюны в прошлом засыпали несколько рыбацких деревень, и только посадки леса остановили пески."
-    ],
-    why:"Самый наглядный пример борьбы человека с природой и её сохранения — вершина «природной» части маршрута.",
-    next:"Возвращаемся на материк и едем на восток, к Неману, в Советск — около 170 км."
+    next:"Возвращаемся на материк и едем на восток, к Неману, — в Советск, около 160 км."
   },
   {
     id:"sovetsk", photo:"13-sovetsk-most-luizy.jpg", lat:55.0846, lng:21.8869,
@@ -482,49 +588,52 @@ const stops = [
       "Бывший Тильзит. В 1807 году на плоту посреди Немана здесь встретились Александр I и Наполеон, а затем был подписан Тильзитский мир — один из ключевых договоров эпохи наполеоновских войн.",
       "Мост королевы Луизы через Неман открыт в 1907 году; от него сохранился портал с гербом Луизы. Сегодня мост ведёт к пограничному переходу в Литву. В городе стоит памятник в честь Тильзитского мира, а ещё отсюда родом знаменитый тильзитский сыр."
     ],
-    why:"Финал маршрута: место, где решалась судьба Европы, а сегодня проходит граница России. Отсюда нить связывает историю региона с большой историей страны.",
+    why:"Финал маршрута: место, где решалась судьба Европы, а сегодня проходит граница России. Здесь нить связывает историю региона с большой историей страны.",
     next:"Конец маршрута. Обратно в Калининград — около 120 км."
   }
 ];
 
-/* ===== СТРОИМ КАРТОЧКИ ОСТАНОВОК ===== */
-const list = document.getElementById('stops-list');
-list.innerHTML = '<h2 class="sec-title">Остановки маршрута</h2>' + stops.map((s,i)=>`
-  <article class="stop" id="${s.id}">
-    <div class="ph-col">
-      <div class="ph" data-file="${s.photo}">
-        <img src="${s.photo}" alt="${s.title}" onerror="this.parentElement.classList.add('noimg')">
-      </div>
+const quiz = [
+  ["Почему Куршская коса называется «куршской»?","По имени балтского племени куршей, жившего на этих берегах в Средние века."],
+  ["Сколько лет балтийскому янтарю?","Около 35–45 миллионов лет. Это окаменевшая смола хвойных деревьев, росших в эпоху эоцена."],
+  ["Как называлась область в первые три месяца?","Кёнигсбергская. 4 июля 1946 года город переименовали в Калининград в честь М. И. Калинина, а вслед за ним и область."],
+  ["Можно ли пройти по всем семи мостам Кёнигсберга, побывав на каждом ровно один раз?","Нет. Эйлер доказал это в 1736 году — и тем самым заложил основы теории графов."],
+  ["Где находится самая западная точка России?","На Балтийской косе, у границы с Польшей, недалеко от Балтийска."],
+  ["Что общего у Советска и сыра?","До 1946 года Советск назывался Тильзитом — отсюда название «тильзитского» сыра, который здесь начали варить в XIX веке."]
+];
+
+const pad = n => String(n).padStart(2,'0');
+
+/* бегущая строка */
+const names = ["Кёнигсберг","Остров Канта","Балтика","Пиллау","Раушен","Кранц","Куршская коса","Тильзит","Янтарный край"];
+document.getElementById('mq').innerHTML = [...names,...names].map(n=>`<span>${n}</span>`).join('');
+
+/* карточки остановок */
+document.getElementById('stops-list').innerHTML = stops.map((s,i)=>`
+  <article class="stop" id="${s.id}" data-i="${i}">
+    <div class="ph" data-file="${s.photo}">
+      <img src="${s.photo}" alt="${s.title}" onerror="this.parentElement.classList.add('noimg')">
     </div>
-    <div>
-      <div class="stop-num">${String(i+1).padStart(2,'0')}</div>
-      <div class="place">${s.place}</div>
-      <h3>${s.title}</h3>
-      ${s.text.map(p=>`<p>${p}</p>`).join('')}
-      <div class="why"><b>Почему это важно:</b> ${s.why}</div>
-      <div class="next">${s.next}</div>
-    </div>
+    <div class="stop-top"><span class="stop-num">${pad(i+1)}</span><span class="place">${s.place}</span></div>
+    <h3>${s.title}</h3>
+    ${s.text.map(p=>`<p>${p}</p>`).join('')}
+    <div class="why"><b>Почему это важно</b>${s.why}</div>
+    <div class="next">${s.next}</div>
   </article>`).join('');
 
-/* ===== КАРТА ===== */
-if (window.L) {
-const map = L.map('map',{scrollWheelZoom:false}).setView([54.85,20.6],9);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  maxZoom:18, attribution:'&copy; участники OpenStreetMap'
-}).addTo(map);
-
-const pts = stops.map(s=>[s.lat,s.lng]);
-L.polyline(pts,{color:'#d98a1c',weight:3,dashArray:'6 8'}).addTo(map);
-
-stops.forEach((s,i)=>{
-  const icon = L.divIcon({className:'num-marker',html:i+1,iconSize:[30,30],iconAnchor:[15,15]});
-  L.marker([s.lat,s.lng],{icon}).addTo(map)
-   .bindPopup(`<b>${i+1}. ${s.title}</b><br>${s.place}<br><a href="#${s.id}">Читать описание ↓</a>`);
+/* викторина */
+document.getElementById('flips').innerHTML = quiz.map((q,i)=>`
+  <div class="flip" tabindex="0"><div class="flip-in">
+    <div class="face front"><div><div class="qn">${pad(i+1)}</div><div class="q">${q[0]}</div></div><div class="hint">Перевернуть →</div></div>
+    <div class="face back"><div class="a">${q[1]}</div><div class="hint">← Назад</div></div>
+  </div></div>`).join('');
+document.querySelectorAll('.flip').forEach(f=>{
+  const t=()=>f.classList.toggle('open');
+  f.addEventListener('click',t);
+  f.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();t();}});
 });
-map.fitBounds(pts,{padding:[30,30]});
-} else { document.getElementById('map').innerHTML='<p style="padding:20px">Карта не загрузилась — проверьте подключение к интернету.</p>'; }
 
-/* ===== ВКЛАДКИ ===== */
+/* вкладки */
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
@@ -532,14 +641,53 @@ document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
   document.getElementById(t.dataset.tab).classList.add('active');
 }));
 
-/* ===== КАРТОЧКИ «ЗНАЕТЕ ЛИ ВЫ» ===== */
-document.querySelectorAll('.card button').forEach(b=>b.addEventListener('click',()=>{
-  const c=b.parentElement; c.classList.toggle('open');
-  b.textContent=c.classList.contains('open')?'Скрыть':'Ответ';
-}));
-
-/* закрывать мобильное меню по клику */
+/* навигация: фон при прокрутке, закрытие мобильного меню */
+const nav=document.getElementById('nav');
+const onScroll=()=>nav.classList.toggle('solid',window.scrollY>40);
+window.addEventListener('scroll',onScroll,{passive:true}); onScroll();
 document.querySelectorAll('.menu a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.menu').classList.remove('open')));
+
+/* появление блоков */
+const ro=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');ro.unobserve(e.target);}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+
+/* ===== КАРТА, которая следует за прокруткой ===== */
+const mlNum=document.getElementById('ml-num'), mlTitle=document.getElementById('ml-title');
+let map=null, markers=[];
+if (window.L) {
+  map = L.map('map',{scrollWheelZoom:false,zoomControl:true}).setView([54.85,20.6],9);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',{
+    maxZoom:19, subdomains:'abcd',
+    attribution:'&copy; OpenStreetMap &copy; CARTO'
+  }).addTo(map);
+  const pts = stops.map(s=>[s.lat,s.lng]);
+  L.polyline(pts,{color:'#0b1d28',weight:2,opacity:.55,dashArray:'4 7'}).addTo(map);
+  markers = stops.map((s,i)=>{
+    const icon=L.divIcon({className:'num-marker',html:i+1,iconSize:[30,30],iconAnchor:[15,15]});
+    return L.marker([s.lat,s.lng],{icon}).addTo(map)
+      .on('click',()=>document.getElementById(s.id).scrollIntoView({behavior:'smooth'}));
+  });
+  map.fitBounds(pts,{padding:[40,40]});
+} else {
+  document.getElementById('map').innerHTML='<p style="padding:24px;color:#16232c">Карта не загрузилась — проверьте подключение к интернету.</p>';
+}
+
+let current=-1;
+function activate(i){
+  if(i===current) return; current=i;
+  document.querySelectorAll('.stop').forEach((el,k)=>el.classList.toggle('active',k===i));
+  mlNum.textContent='Остановка '+pad(i+1); mlTitle.textContent=stops[i].title;
+  if(map){
+    markers.forEach((m,k)=>{const el=m.getElement(); if(el) el.classList.toggle('active',k===i);});
+    const z = i<=4 ? 13 : 10;   // в Калининграде — ближе, за городом — шире
+    map.flyTo([stops[i].lat,stops[i].lng],z,{duration:1.2});
+  }
+}
+const so=new IntersectionObserver(es=>{
+  es.forEach(e=>{ if(e.isIntersecting) activate(+e.target.dataset.i); });
+},{rootMargin:'-45% 0px -45% 0px'});
+document.querySelectorAll('.stop').forEach(el=>so.observe(el));
+activate(0);
 </script>
 </body>
 </html>
