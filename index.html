@@ -168,8 +168,8 @@
 
 <!-- ================= ШАПКА ================= -->
 <header class="hero" id="top">
-  <div class="ph bg" data-file="images/hero.jpg">
-    <img src="images/hero.jpg" alt="Балтийское побережье Калининградской области" onerror="this.parentElement.classList.add('noimg')">
+  <div class="ph bg" data-file="hero.jpg">
+    <img src="hero.jpg" alt="Балтийское побережье Калининградской области" onerror="this.parentElement.classList.add('noimg')">
   </div>
   <div class="wrap">
     <div class="kicker">Путеводитель · Калининградская область</div>
@@ -208,7 +208,7 @@
         <p>Климат переходный от морского к умеренно-континентальному: мягкая зима, нежаркое лето, много осадков.</p>
       </div>
       <div>
-        <div class="ph" data-file="images/region-priroda.jpg"><img src="images/region-priroda.jpg" alt="Природа Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
+        <div class="ph" data-file="region-priroda.jpg"><img src="region-priroda.jpg" alt="Природа Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
         <p class="cap">Подпишите, где сделано фото</p>
       </div>
     </div>
@@ -227,7 +227,7 @@
         </ul>
       </div>
       <div>
-        <div class="ph" data-file="images/region-istoriya.jpg"><img src="images/region-istoriya.jpg" alt="Исторический Калининград" onerror="this.parentElement.classList.add('noimg')"></div>
+        <div class="ph" data-file="region-istoriya.jpg"><img src="region-istoriya.jpg" alt="Исторический Калининград" onerror="this.parentElement.classList.add('noimg')"></div>
         <p class="cap">Подпишите, где сделано фото</p>
       </div>
     </div>
@@ -245,7 +245,7 @@
         </ul>
       </div>
       <div>
-        <div class="ph" data-file="images/region-yantar.jpg"><img src="images/region-yantar.jpg" alt="Янтарь" onerror="this.parentElement.classList.add('noimg')"></div>
+        <div class="ph" data-file="region-yantar.jpg"><img src="region-yantar.jpg" alt="Янтарь" onerror="this.parentElement.classList.add('noimg')"></div>
         <p class="cap">Например, ваше фото янтаря или изделий из него</p>
       </div>
     </div>
@@ -257,7 +257,7 @@
         <p>Большинство верующих — православные. Главный храм — <b>Храм Христа Спасителя</b> на площади Победы, освящённый в 2006 году. Многие бывшие лютеранские и католические кирхи сегодня отданы Русской православной церкви или служат концертными залами, например бывшая кирха Святого Семейства — сейчас Калининградская филармония. Действуют также католические и лютеранские приходы, синагога, восстановленная в 2018 году на историческом месте.</p>
       </div>
       <div>
-        <div class="ph" data-file="images/region-hram.jpg"><img src="images/region-hram.jpg" alt="Храм Христа Спасителя в Калининграде" onerror="this.parentElement.classList.add('noimg')"></div>
+        <div class="ph" data-file="region-hram.jpg"><img src="region-hram.jpg" alt="Храм Христа Спасителя в Калининграде" onerror="this.parentElement.classList.add('noimg')"></div>
         <p class="cap">Храм Христа Спасителя на площади Победы</p>
       </div>
     </div>
@@ -274,7 +274,7 @@
         </ul>
       </div>
       <div>
-        <div class="ph" data-file="images/region-kultura.jpg"><img src="images/region-kultura.jpg" alt="Культура Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
+        <div class="ph" data-file="region-kultura.jpg"><img src="region-kultura.jpg" alt="Культура Калининградской области" onerror="this.parentElement.classList.add('noimg')"></div>
         <p class="cap">Подпишите, где сделано фото</p>
       </div>
     </div>
@@ -353,7 +353,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* ===== ДАННЫЕ ОСТАНОВОК =====
-   photo — имя файла в папке images/ */
+   photo — имя файла в папке  */
 const stops = [
   {
     id:"sobor", photo:"01-kafedralnyj-sobor.jpg", lat:54.7066, lng:20.5118,
@@ -492,8 +492,8 @@ const list = document.getElementById('stops-list');
 list.innerHTML = '<h2 class="sec-title">Остановки маршрута</h2>' + stops.map((s,i)=>`
   <article class="stop" id="${s.id}">
     <div class="ph-col">
-      <div class="ph" data-file="images/${s.photo}">
-        <img src="images/${s.photo}" alt="${s.title}" onerror="this.parentElement.classList.add('noimg')">
+      <div class="ph" data-file="${s.photo}">
+        <img src="${s.photo}" alt="${s.title}" onerror="this.parentElement.classList.add('noimg')">
       </div>
     </div>
     <div>
