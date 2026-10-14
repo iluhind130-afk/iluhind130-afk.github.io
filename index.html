@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Дорогая Лиза, с годовщиной тебя! ❤️</title>
+    <title>Лиза, с годовщиной! ❤️</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -65,6 +65,18 @@
             -webkit-background-clip: text; background-clip: text; color: transparent;
             margin: 10px 0 0;
         }
+        .hero .age-label {
+            font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(22px, 5vw, 30px);
+            color: var(--rose-deep); margin: -6px 0 18px;
+        }
+        .counter { display: flex; justify-content: center; gap: 10px; margin-top: 26px; flex-wrap: wrap; }
+        .counter .cell {
+            background: var(--paper); border-radius: 16px; padding: 10px 14px; min-width: 74px;
+            box-shadow: var(--shadow); border: 1px solid rgba(200,161,90,.18);
+        }
+        .counter .n { font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 700; color: var(--navy); line-height: 1; font-variant-numeric: tabular-nums; }
+        .counter .u { font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 4px; }
+        .counter-cap { margin-top: 26px; font-size: 13px; font-weight: 700; letter-spacing: .2em; color: var(--gold); text-transform: uppercase; }
         .hero h1 { font-size: clamp(38px, 9vw, 64px); color: var(--navy); line-height: 1.1; }
         .hero h1 em { color: var(--rose-deep); font-style: italic; }
         .hero p.sub { color: var(--muted); margin-top: 12px; font-size: 17px; max-width: 460px; }
@@ -260,16 +272,27 @@
     <span class="float" style="top:34%;right:6%;animation-delay:-6s">👑</span>
     <span class="float" style="top:62%;left:14%;animation-delay:-3s">♪</span>
     <span class="float" style="top:58%;right:14%;animation-delay:-5s">∞</span>
+    <span class="float" style="top:80%;left:6%;animation-delay:-7s">❤️</span>
+    <span class="float" style="top:76%;right:5%;animation-delay:-1s">💌</span>
 
-    <div class="date">16 · 10 · 2026</div>
-    <div class="age">18</div>
-    <h1>С днём рождения,<br><em>Лиза!</em></h1>
-    <p class="sub">Этот сайт сделан специально для тебя. Внутри три сюрприза, открывай по порядку ✨</p>
+    <div class="date">16 · 04 · 2026 → 16 · 10 · 2026</div>
+    <div class="age">6</div>
+    <div class="age-label">месяцев вместе</div>
+    <h1>С годовщиной,<br><em>Лиза!</em></h1>
+    <p class="sub">Полгода назад всё началось. Я собрал здесь наши моменты, открывай по порядку ✨</p>
+
+    <div class="counter-cap">Мы вместе уже</div>
+    <div class="counter" id="counter">
+        <div class="cell"><div class="n" id="cD">0</div><div class="u">дней</div></div>
+        <div class="cell"><div class="n" id="cH">0</div><div class="u">часов</div></div>
+        <div class="cell"><div class="n" id="cM">0</div><div class="u">минут</div></div>
+        <div class="cell"><div class="n" id="cS">0</div><div class="u">секунд</div></div>
+    </div>
 
     <div class="cards">
-        <a class="card" href="#quiz"><div class="ico">🧩</div><div><div class="t">Викторина</div><div class="d">Насколько хорошо ты помнишь нашу историю?</div></div></a>
+        <a class="card" href="#quiz"><div class="ico">🧩</div><div><div class="t">Викторина</div><div class="d">Насколько хорошо ты помнишь наши полгода?</div></div></a>
         <a class="card" href="#gallery"><div class="ico">📸</div><div><div class="t">Галерея</div><div class="d">Наши моменты</div></div></a>
-        <a class="card" href="#wishes"><div class="ico">💌</div><div><div class="t">Пожелания</div><div class="d">Письмо для тебя</div></div></a>
+        <a class="card" href="#wishes"><div class="ico">💌</div><div><div class="t">Письмо</div><div class="d">Пара слов от меня</div></div></a>
     </div>
 
     <span class="boat">⛵</span>
@@ -282,7 +305,7 @@
 <nav>
     <a href="#quiz">🧩 Викторина</a>
     <a href="#gallery">📸 Галерея</a>
-    <a href="#wishes">💌 Пожелания</a>
+    <a href="#wishes">💌 Письмо</a>
 </nav>
 
 <!-- ================= 1. QUIZ ================= -->
@@ -290,7 +313,7 @@
     <div class="head">
         <div class="num">ЧАСТЬ I</div>
         <h2>Викторина</h2>
-        <p>Проверим, насколько хорошо ты помнишь наши совместные моменты!</p>
+        <p>Полгода позади. Проверим, насколько хорошо ты помнишь наши моменты!</p>
     </div>
     <div class="quiz" id="quizBox"></div>
 </section>
@@ -301,7 +324,7 @@
 <section class="block" id="gallery">
     <div class="head">
         <div class="num">ЧАСТЬ II</div>
-        <h2>Наша галерея</h2>
+        <h2>Наши полгода</h2>
         <p>Нажми на фото, чтобы открыть</p>
     </div>
     <div class="subhead"><span>Наши истории</span></div>
@@ -317,21 +340,23 @@
 <section class="block" id="wishes">
     <div class="head">
         <div class="num">ЧАСТЬ III</div>
-        <h2>Пожелания</h2>
+        <h2>Письмо</h2>
         <p>Нажми на конверт</p>
     </div>
     <div class="envelope-wrap" id="envWrap">
-        <div class="envelope" id="envelope"><div class="seal">♛</div></div>
+        <div class="envelope" id="envelope"><div class="seal">❤</div></div>
     </div>
     <div class="letter" id="letter">
-        <h3>Дорогая Лиза,</h3>
-        <p>[Здесь будет твоё поздравление. Пришли мне текст, и я красиво вставлю его сюда.]</p>
-        <p>[Можно несколько абзацев.]</p>
+        <h3>Моя Лиза,</h3>
+        <!-- Это черновик. Поменяй текст как хочешь: каждый абзац между <p> и </p> -->
+        <p>Полгода назад, 16 апреля, всё началось. А кажется, что ты была рядом всегда.</p>
+        <p>За это время было столько всего: лицей и Зубик, выпускной, дача, Архангельское, звонки по пять часов и больше сорока тысяч сообщений. И в каждом из этих моментов лучшим была ты.</p>
+        <p>Спасибо тебе за твою улыбку, за терпение (особенно к моим кружочкам) и за то, что ты такая, какая есть. Я очень тебя люблю и жду всех наших следующих полгода.</p>
         <div class="sign">Твой Бобик</div>
     </div>
 </section>
 
-<footer>Сделано специально для Лизы · 2026</footer>
+<footer>Сделано специально для Лизы · полгода вместе · 16.10.2026</footer>
 
 <div class="lightbox" id="lightbox"><img id="lbImg" alt=""><div class="cap" id="lbCap"></div></div>
 
@@ -607,6 +632,20 @@
         document.getElementById('letter').style.display = 'block';
         burst(200);
     };
+
+    /* ---------------- СЧЁТЧИК: сколько мы вместе ---------------- */
+    const START = new Date('2026-04-16T00:00:00+03:00');
+    function tick() {
+        let t = Math.max(0, Math.floor((Date.now() - START) / 1000));
+        const d = Math.floor(t / 86400); t %= 86400;
+        const h = Math.floor(t / 3600); t %= 3600;
+        const m = Math.floor(t / 60), sec = t % 60;
+        document.getElementById('cD').textContent = d;
+        document.getElementById('cH').textContent = h;
+        document.getElementById('cM').textContent = m;
+        document.getElementById('cS').textContent = sec;
+    }
+    tick(); setInterval(tick, 1000);
 
     /* ---------------- CONFETTI ---------------- */
     const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
